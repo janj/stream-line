@@ -46,7 +46,17 @@ export function loadAMPsuite(data: any): AmpSheetRow[] {
   const sheetName = workbook.SheetNames[0]
   const workSheet = workbook.Sheets[sheetName]
   const sheetRange = XLSX.utils.decode_range(workSheet['!ref']!)
-  const asJson = XLSX.utils.sheet_to_json<AmpSheetRaw>(workSheet, { range: { s: { c:0, r:10 }, e: sheetRange.e}})
+  const testJson = XLSX.utils.sheet_to_csv(workSheet, { RS: '\n'})
+  let startIndex = 0
+  testJson.split('\n').some((row, index) => {
+    const fullCols = row.split(',').filter((h) => !!h)
+    // the first row with more than 10 cols is hopefully header row
+    if (fullCols.length > 10 && !startIndex) {
+      startIndex = index
+      return
+    }
+  })
+  const asJson = XLSX.utils.sheet_to_json<AmpSheetRaw>(workSheet, { range: { s: { c:0, r:startIndex }, e: sheetRange.e}})
   return asJson.map(toAmpSheet)
 }
 

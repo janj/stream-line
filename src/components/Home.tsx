@@ -10,8 +10,11 @@ export default function Home() {
   const [sheet, setSheet] = React.useState<AmpSheetRow[]>([])
 
   function fileSelected(data: any) {
-    const sheet = loadAMPsuite(data)
-    setSheet(sheet)
+    const rows: AmpSheetRow[] = []
+    Object.values(data).forEach((sheetData) => {
+      rows.push(...loadAMPsuite(sheetData))
+    })
+    setSheet(rows)
   }
 
   return <div style={{ padding: 25 }}>
