@@ -33,7 +33,7 @@ export default function Retailers({ sheet }: { sheet: AmpSheetRow[] }) {
       byRetailer[retailer].forEach((track) => {
         if (currentArtist === ALL || currentArtist === track.Artist) {
           revTotal += track.Revenue
-          streamTotal += parseInt(track.Quantity)
+          streamTotal += track.Quantity
         }
       })
       revenue.push(revTotal)

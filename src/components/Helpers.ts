@@ -29,7 +29,7 @@ function toAmpSheet(rowObj: AmpSheetRaw) {
     Label: rowObj.Label,
     PeriodFrom: rowObj['Period From'],
     PeriodTo: rowObj['Period To'],
-    Quantity: rowObj.Quantity,
+    Quantity: parseInt(rowObj.Quantity),
     ReleaseTitle: rowObj['Release Title'],
     Revenue: rowObj.Revenue,
     SuitebeatsComp: rowObj['Suitebeats Comp.'],

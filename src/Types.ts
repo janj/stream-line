@@ -7,7 +7,7 @@ export interface AmpSheetRow {
   Label: string
   PeriodFrom: string
   PeriodTo: string
-  Quantity: string
+  Quantity: number
   ReleaseTitle: string
   Revenue: number
   SuitebeatsComp: string
