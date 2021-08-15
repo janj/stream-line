@@ -3,34 +3,25 @@ import ReactApexChart from 'react-apexcharts'
 import { AmpSheetRow } from '../Types'
 import { getByRetailer } from './Helpers'
 import { ApexOptions } from 'apexcharts'
-import { Box, MenuItem, Select } from '@material-ui/core'
-
-const ALL = 'all'
+import { Box } from '@material-ui/core'
+import Filters, { ALL, IFilters } from './Filters'
 
 export default function Retailers({ sheet }: { sheet: AmpSheetRow[] }) {
   const [byRetailer, setByRetailer] = React.useState<{[retailer: string]: AmpSheetRow[]}>({})
   const [currentSeries, setSeries] = React.useState<{ data: number[] }[]>([])
   const [currentCategories, setCategories] = React.useState<string[]>([])
-  const [allArtists, setAllArtists] = React.useState<string[]>([])
-  const [currentArtist, setCurrentArtist] = React.useState(ALL)
+  const [currentArtist, setCurrentArtist] = React.useState('')
   const [availableSeries, setAvailableSeries] = React.useState<{[label: string]: number[]}>({})
   const [selectedSeries, setSelectedSeries] = React.useState('')
 
   React.useEffect(() => {
     const byRetailer = getByRetailer(sheet)
     const categories: string[] = []
-    const artists: string[] = []
     Object.keys(byRetailer).forEach((retailer) => {
       categories.push(retailer)
-      byRetailer[retailer].forEach((track) => {
-        if (track.Artist && !artists.includes(track.Artist)) {
-          artists.push(track.Artist)
-        }
-      })
     })
     setByRetailer(byRetailer)
     setCategories(categories)
-    setAllArtists(artists)
   }, [sheet])
 
   React.useEffect(() => {
@@ -50,7 +41,6 @@ export default function Retailers({ sheet }: { sheet: AmpSheetRow[] }) {
     })
     setAvailableSeries({ revenue, streams })
     setSeries([{ data: streams }])
-    setSelectedSeries('streams')
   }, [currentArtist, byRetailer])
 
   React.useEffect(() => {
@@ -58,6 +48,11 @@ export default function Retailers({ sheet }: { sheet: AmpSheetRow[] }) {
       setSeries([{data: availableSeries[selectedSeries]}])
     }
   }, [selectedSeries, availableSeries])
+
+  function onFilterChange({ artist, streamOrRevenue }: IFilters) {
+    setCurrentArtist(artist)
+    setSelectedSeries(streamOrRevenue)
+  }
 
   const options: ApexOptions = {
     chart: {
@@ -78,23 +73,7 @@ export default function Retailers({ sheet }: { sheet: AmpSheetRow[] }) {
     }
   }
   return <Box>
-    <Select
-      value={currentArtist}
-      onChange={(e) => setCurrentArtist(e.target.value as string)}
-      style={{padding: 6, margin: 6}}
-      >
-      <MenuItem value={ALL}>All</MenuItem>
-      {allArtists.map((a) => <MenuItem key={a} value={a}>{a}</MenuItem>)}
-    </Select>
-    <Select
-      value={selectedSeries}
-      onChange={(e) => setSelectedSeries(e.target.value as string)}
-      style={{padding: 6, margin: 6}}
-      >
-      {Object.keys(availableSeries).map((series) => {
-        return <MenuItem key={series} value={series}>{series}</MenuItem>
-      })}
-    </Select>
+    <Filters sheet={sheet} onFiltersChanged={onFilterChange} />
     <ReactApexChart options={options} series={currentSeries} type="bar" height={350} />
   </Box>
 }
