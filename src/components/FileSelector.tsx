@@ -40,7 +40,6 @@ export function StatementsSelector({onStatementsSelect, label}: {label?: string,
       acc.push(...loadStatementFile(sheetData))
       return acc
     }, [])
-    console.log('setting', asRows)
     onStatementsSelect(asRows)
   }
 

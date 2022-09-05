@@ -9,4 +9,7 @@ export class ParseObj {
   constructor(parseObj: Parse.Object) {
     this.parseObj = parseObj
   }
+  get id() {
+    return this.parseObj.id
+  }
 }

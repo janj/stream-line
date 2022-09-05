@@ -24,7 +24,7 @@ function UserRequired({children}: {children: any}) {
     const currentUser = Parse.User.current()
     if (!currentUser) navigate('/stream-line')
     setCurrentUser(currentUser)
-  }, [])
+  }, [navigate])
 
   if (!currentUser) return <Box></Box>
 

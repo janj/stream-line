@@ -13,9 +13,10 @@ export function Management() {
   const [manager, setManager] = React.useState<ArtistsManager>()
 
   React.useEffect(() => {
-    Promise.all([getArtists(), getMappings()])
-      .then(([artists, mappings]) => {
-      setManager(new ArtistsManager(artists, mappings))
+    getArtists().then((allArtists) => {
+      return getMappings(allArtists).then((mappings) => {
+        setManager(new ArtistsManager(allArtists, mappings))
+      })
     })
   }, [])
 

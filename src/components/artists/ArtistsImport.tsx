@@ -35,6 +35,7 @@ function ArtistImport({ name, manager }: {
 
   React.useEffect(() => {
     setExistingArtist(manager.artistForName(name))
+    setExistingMapping(manager.mappingForName(name))
   }, [name, manager])
 
   function doIt() {

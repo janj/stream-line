@@ -5,13 +5,32 @@ import TrackDetails from './TrackDetails'
 import Retailers from './Retailers'
 import Locations from './Locations'
 import { Box } from '@material-ui/core'
+import { getMappings, IArtistMapping } from './artists/artistMapping'
+import { getArtists, mapArtists } from './artists/artist'
 
 export default function Home() {
   const [sheet, setSheet] = React.useState<StatementRow[]>([])
+  const [mappings, setMappings] = React.useState<{[name: string]: IArtistMapping}>()
+
+  React.useState(() => {
+    getArtists().then((allArtists) => {
+      getMappings(allArtists).then(setMappings)
+    })
+  })
+
+  if (!mappings) return <Box>Loading...</Box>
+
+  function onStatementsSelect(rows: StatementRow[]) {
+    if (!mappings) {
+      setSheet(rows)
+    } else {
+      setSheet(mapArtists(rows, mappings))
+    }
+  }
 
   return <Box style={{ padding: 25 }}>
     <Box style={{ padding: 25 }}>
-      <StatementsSelector onStatementsSelect={setSheet} />
+      <StatementsSelector onStatementsSelect={onStatementsSelect} />
     </Box>
     {!!sheet.length && <Box style={{ padding: 25, border: 'solid 1px' }}>
       Tracks

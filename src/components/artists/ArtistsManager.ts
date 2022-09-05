@@ -5,15 +5,12 @@ export class ArtistsManager {
   artistsByName: {[name: string]: IArtist}
   mappingsByName: {[name: string]: IArtistMapping}
 
-  constructor(existingArtists: IArtist[], existingMappings: IArtistMapping[]) {
+  constructor(existingArtists: IArtist[], existingMappings: {[name: string]: IArtistMapping}) {
     this.artistsByName = existingArtists.reduce((acc: {[name: string]: IArtist}, artist) => {
       acc[artist.name] = artist
       return acc
     }, {})
-    this.mappingsByName = existingMappings.reduce((acc: {[name: string]: IArtistMapping}, mapping) => {
-      acc[mapping.name] = mapping
-      return acc
-    }, {})
+    this.mappingsByName = existingMappings
   }
 
   createArtist(params: { name: string }) {
@@ -32,5 +29,8 @@ export class ArtistsManager {
 
   artistForName(name: string) {
     return this.artistsByName[name]
+  }
+  mappingForName(name: string) {
+    return this.mappingsByName[name]
   }
 }
