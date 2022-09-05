@@ -1,13 +1,13 @@
 import React from 'react'
-import { AmpSheetRow } from '../Types'
+import { StatementRow } from '../Types'
 import { getByLocation } from './Helpers'
 import { ApexOptions } from 'apexcharts'
 import ReactApexChart from 'react-apexcharts'
 import { Box } from '@material-ui/core'
 import Filters, { ALL, IFilters } from './Filters'
 
-export default function Locations({ sheet }: { sheet: AmpSheetRow[] }) {
-  const [byLocation, setByLocation] = React.useState<{ [location: string]: AmpSheetRow[]}>({})
+export default function Locations({ sheet }: { sheet: StatementRow[] }) {
+  const [byLocation, setByLocation] = React.useState<{ [location: string]: StatementRow[]}>({})
   const [locations, setLocations] = React.useState<string[]>([])
   const [currentArtist, setCurrentArtist] = React.useState('')
   const [selectedSeries, setSelectedSeries] = React.useState('')

@@ -1,37 +1,25 @@
 import React from 'react';
-import { Button } from '@material-ui/core';
+import { Box, Button } from '@material-ui/core'
+import { FileData, loadFiles } from './statements/utility'
+import { StatementRow } from '../Types'
+import { loadStatementFile } from './Helpers'
 
-export default function FileSelector({ onLoad }: { onLoad: (data: any) => void }) {
-  function loadFiles(toLoad: any[], loaded: {[key: string]: any} = {}) {
-    if (!toLoad.length) {
-      onLoad(loaded)
-      return
-    }
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const data = e.target?.result;
-      loaded[toLoad[0].name] = data
-      loadFiles(toLoad.slice(1), loaded)
-    }
-    reader.onerror = function(ex) {
-      console.log(ex);
-    };
-    reader.readAsBinaryString(toLoad[0]);
-  }
+function FileSelector({ label, onLoad }: { label?: string; onLoad: (data: FileData) => void }) {
+  const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
 
   function filesSelected(e: any) {
-    const files = []
-    for (let i=0; i<e.target.files.length; i++) {
-      files.push(e.target.files[i])
-    }
-    loadFiles(files)
+    setSelectedFiles(Array.from(e.target.files))
   }
 
-  return <Button
+  function processFiles() {
+    loadFiles(selectedFiles).then(onLoad)
+  }
+
+  return <Box><Button
     variant="contained"
     component="label"
   >
-    Upload Files
+    Select Files
     <input
       type="file"
       onChange={filesSelected}
@@ -39,4 +27,22 @@ export default function FileSelector({ onLoad }: { onLoad: (data: any) => void }
       multiple
     />
   </Button>
+    {!!selectedFiles.length && <Box>
+      {selectedFiles.map((file, i) => <Box key={i}>{file.name}</Box>)}
+      <Box><Button onClick={processFiles}>{label || 'DoIt'}</Button></Box>
+    </Box>}
+  </Box>
+}
+
+export function StatementsSelector({onStatementsSelect, label}: {label?: string, onStatementsSelect: (rows: StatementRow[]) => void}) {
+  function onSelect(data: FileData) {
+    const asRows = Object.values(data).reduce((acc: StatementRow[], sheetData) => {
+      acc.push(...loadStatementFile(sheetData))
+      return acc
+    }, [])
+    console.log('setting', asRows)
+    onStatementsSelect(asRows)
+  }
+
+  return <FileSelector onLoad={onSelect} label={label} />
 }

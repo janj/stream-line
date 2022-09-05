@@ -1,45 +1,54 @@
 import * as XLSX from 'xlsx'
-import { AmpSheetRow } from '../Types'
+import { statementColMap, StatementRow } from '../Types'
 
-interface AmpSheetRaw {
-  Artist: string
-  'Content Type': string
-  'Delivery Method': string
-  Distributor: string
-  ISRC: string
-  Label: string
-  'Period From': string
-  'Period To': string
-  Quantity: string
-  'Release Title': string
-  Revenue: number
-  'Suitebeats Comp.': string
-  'Territory': string
-  'Track Title': string
-  UPC: string
+function toStatement(rowObj: {[key: string]: string}): StatementRow {
+  const dataObj: {[key: string]: string} = {}
+  Object.keys(rowObj).forEach((col) => {
+    const objKey = Object.keys(statementColMap).find((key) => {
+      return statementColMap[key].includes(col.toLowerCase())
+    })
+    if (!objKey) {
+      console.log('not mapping:', col, rowObj[col])
+    } else if (objKey !== 'Ignore') {
+      dataObj[objKey] = rowObj[col]
+    }
+  })
+  return dataObj as unknown as StatementRow
 }
 
-function toAmpSheet(rowObj: AmpSheetRaw) {
-  return {
-    Artist: rowObj.Artist,
-    ContentType: rowObj['Content Type'],
-    DeliveryMethod: rowObj['Delivery Method'],
-    Distributor: rowObj.Distributor,
-    ISRC: rowObj.ISRC,
-    Label: rowObj.Label,
-    PeriodFrom: rowObj['Period From'],
-    PeriodTo: rowObj['Period To'],
-    Quantity: parseInt(rowObj.Quantity),
-    ReleaseTitle: rowObj['Release Title'],
-    Revenue: rowObj.Revenue,
-    SuitebeatsComp: rowObj['Suitebeats Comp.'],
-    Territory: rowObj.Territory,
-    TrackTitle: rowObj['Track Title'],
-    UPC: rowObj.UPC
-  }
-}
+const dataCols = [
+  'Period From',
+  'Period To',
+  'Transaction Data',
+  'Distributor',
+  'UPC',
+  'Cat. No.',
+  'ISRC',
+  'Label',
+  'Release Title',
+  'Track Title',
+  'Mix Name',
+  'Artist',
+  'Content Type',
+  'Delivery Method',
+  'Territory',
+  'Quantity',
+  'Revenue',
+  'Sales Start Date',
+  'Sales End Date',
+  'EAN/UPC',  // what is this
+  'Album Name',
+  'Track Name',
+  'Store',
+  'Country Name',
+  'Country ISO',
+  'Total Plays',
+  'Total Downloads',
+  'Amount',
+  'Amount Currency'
+]
 
-export function loadAMPsuite(data: any): AmpSheetRow[] {
+export function loadStatementFile(data: string): StatementRow[] {
   const workbook = XLSX.read(data, {
     type: 'binary'
   });
@@ -47,41 +56,45 @@ export function loadAMPsuite(data: any): AmpSheetRow[] {
   const workSheet = workbook.Sheets[sheetName]
   const sheetRange = XLSX.utils.decode_range(workSheet['!ref']!)
   const testJson = XLSX.utils.sheet_to_csv(workSheet, { RS: '\n'})
-  let startIndex = 0
-  testJson.split('\n').some((row, index) => {
+  let startIndex = -1
+  testJson.split('\n').forEach((row, index) => {
+    if (startIndex >= 0) return
     const fullCols = row.split(',').filter((h) => !!h)
-    // the first row with more than 10 cols is hopefully header row
-    if (fullCols.length > 10 && !startIndex) {
+    const cols = fullCols.filter((col) => dataCols.includes(col))
+    if (cols.length > fullCols.length / 2) {
       startIndex = index
-      return
     }
   })
-  const asJson = XLSX.utils.sheet_to_json<AmpSheetRaw>(workSheet, { range: { s: { c:0, r:startIndex }, e: sheetRange.e}})
-  return asJson.map(toAmpSheet)
+  if (startIndex < 0) {
+    throw new Error('header row not found')
+  }
+
+  const asJson = XLSX.utils.sheet_to_json<{[key: string]: string}>(workSheet, { range: { s: { c:0, r:startIndex }, e: sheetRange.e}})
+  return asJson.map(toStatement)
 }
 
-export function getByIsrc(data: AmpSheetRow[]) {
+export function getByIsrc(data: StatementRow[]) {
   return getMultiByKeyProp('ISRC', data)
 }
 
-export function getByTerritory(data: AmpSheetRow[]) {
+export function getByTerritory(data: StatementRow[]) {
   return getMultiByKeyProp('Territory', data)
 }
 
-export function getByArtist(data: AmpSheetRow[]) {
+export function getByArtist(data: StatementRow[]) {
   return getMultiByKeyProp('Artist', data)
 }
 
-export function getByRetailer(data: AmpSheetRow[]) {
+export function getByRetailer(data: StatementRow[]) {
   return getMultiByKeyProp('Distributor', data)
 }
 
-export function getByLocation(data: AmpSheetRow[]) {
+export function getByLocation(data: StatementRow[]) {
   return getMultiByKeyProp('Territory', data)
 }
 
-export function getMultiByKeyProp(key: keyof AmpSheetRow, data: AmpSheetRow[]) {
-  const byKeyProp: {[key: string]: AmpSheetRow[]} = {}
+export function getMultiByKeyProp(key: keyof StatementRow, data: StatementRow[]) {
+  const byKeyProp: {[key: string]: StatementRow[]} = {}
   data.forEach((row) => {
     !byKeyProp[row[key]] && (byKeyProp[row[key]] = [])
     byKeyProp[row[key]].push(row)
@@ -89,7 +102,7 @@ export function getMultiByKeyProp(key: keyof AmpSheetRow, data: AmpSheetRow[]) {
   return byKeyProp
 }
 
-export function consolidateRvByDate(data: AmpSheetRow[]) {
+export function consolidateRvByDate(data: StatementRow[]) {
   const byDate: { [key: string]: number } = {}
   data?.forEach((d) => {
     !byDate[d.PeriodTo] && (byDate[d.PeriodTo] = 0)

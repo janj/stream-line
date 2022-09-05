@@ -1,8 +1,8 @@
 import { DataGrid, GridColDef, GridRowData, GridRowsProp } from '@material-ui/data-grid'
-import { AmpSheetRow } from '../Types'
+import { StatementRow } from '../Types'
 import { getByIsrc } from './Helpers'
 
-export default function TrackDetails({ sheet }: { sheet: AmpSheetRow[]}) {
+export default function TrackDetails({ sheet }: { sheet: StatementRow[]}) {
   const cols: GridColDef[] = [
     { field: 'title', headerName: 'Title', width: 150 },
     { field: 'artist', headerName: 'Artist', width: 150 },
