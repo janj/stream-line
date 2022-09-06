@@ -1,54 +1,69 @@
 import React from 'react';
 import { Box, Button, MenuItem, Select } from '@material-ui/core'
 import { IArtist } from './artist'
-import { ArtistsManager } from './ArtistsManager'
-import { IArtistMapping } from './artistMapping'
+import { ArtistsManager, IArtistsByName, IMappingsByName } from './ArtistsManager'
 
 export function ArtistsImport({manager, statementArtists}: {
   manager: ArtistsManager
   statementArtists: string[]
 }) {
+  const [mappings, setMappings] = React.useState<IMappingsByName>({})
+  const [artists, setArtists] = React.useState<IArtistsByName>({})
+  const [neither, setNeither] = React.useState<string[]>([])
+
+  const artistSort = React.useCallback(() => {
+    const {artists, mapped, neither} = manager.sortNames(statementArtists)
+    setArtists(artists)
+    setMappings(mapped)
+    setNeither(neither)
+  }, [manager, statementArtists])
+
+  React.useEffect(() => {
+    artistSort()
+  }, [artistSort])
+
   return <Box>
-    {statementArtists.map((artist) => <ArtistImport
-      key={artist}
-      name={artist}
-      manager={manager}
-    />)}
+    <UnknownArtists names={neither} manager={manager} onUpdate={artistSort}/>
+    <ExistingArtists artists={artists} />
+    <ExistingMappings mappings={mappings} />
   </Box>
 }
 
-function ExistingArtist({ artist }: { artist: IArtist }) {
-  return <Box>{artist.name}</Box>
+function ExistingArtists({ artists }: { artists: IArtistsByName }) {
+  return <Box border={'solid 1px'} padding={'5px'}>
+    <Box><b>Artists</b></Box>
+    <Box padding={'10px'}>{Object.values(artists).map((a) => <Box>{a.name}</Box>)}</Box>
+  </Box>
 }
 
-function ExistingMapping({ mapping }: { mapping: IArtistMapping }) {
-  return <Box>{`${mapping.name} MAPPED TO: ${mapping.mappedTo.name}`}</Box>
+function ExistingMappings({ mappings }: { mappings: IMappingsByName }) {
+  return <Box border={'solid 1px'} padding={'5px'}>
+    <Box><b>Mappings</b></Box>
+    <Box padding={'10px'}>{Object.values(mappings).map((m) => <Box>{m.name}<b>{' MAPPED TO: '}</b>{m.mappedTo.name}</Box>)}</Box>
+  </Box>
 }
 
-function ArtistImport({ name, manager }: {
+function UnknownArtists({ names, manager, onUpdate }: { names: string[]; manager: ArtistsManager; onUpdate: () => void }) {
+  return <Box border={'solid 1px'} padding={'5px'}>
+    <Box><b>Unknown Artists</b></Box>
+    <Box padding={'10px'}>{names.map((name) => <ArtistImport manager={manager} name={name} onUpdate={onUpdate}/>)}</Box>
+  </Box>
+}
+
+function ArtistImport({ name, manager, onUpdate }: {
   name: string
   manager: ArtistsManager
+  onUpdate: () => void
 }) {
   const [isMapping, setIsMapping] = React.useState(false)
-  const [existingArtist, setExistingArtist] = React.useState<IArtist>()
-  const [existingMapping, setExistingMapping] = React.useState<IArtistMapping>()
-
-  React.useEffect(() => {
-    setExistingArtist(manager.artistForName(name))
-    setExistingMapping(manager.mappingForName(name))
-  }, [name, manager])
 
   function doIt() {
-    manager.createArtist({ name }).then(setExistingArtist)
+    manager.createArtist({ name }).then(onUpdate)
   }
 
   function doMapping(mappedTo: IArtist) {
-    manager.createMapping({ name, mappedTo }).then(setExistingMapping)
+    manager.createMapping({ name, mappedTo }).then(onUpdate)
   }
-
-  if (existingArtist) return <ExistingArtist artist={existingArtist} />
-
-  if (existingMapping) return <ExistingMapping mapping={existingMapping} />
 
   return <Box>
     <Box>

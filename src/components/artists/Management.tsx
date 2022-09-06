@@ -28,7 +28,7 @@ export function Management() {
 
   return <Box>
     <Box>Artist Management</Box>
-    <Box><StatementsSelector label={'Import From Statements'} onStatementsSelect={statementImport} /></Box>
+    <Box><StatementsSelector label={'Import File Data'} onStatementsSelect={statementImport} /></Box>
     <ArtistsImport manager={manager} statementArtists={statementArtists} />
   </Box>
 }

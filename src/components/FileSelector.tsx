@@ -5,6 +5,7 @@ import { StatementRow } from '../Types'
 import { loadStatementFile } from './Helpers'
 
 function FileSelector({ label, onLoad }: { label?: string; onLoad: (data: FileData) => void }) {
+  const [displayFiles, setDisplayFiles] = React.useState(false)
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
 
   function filesSelected(e: any) {
@@ -12,7 +13,16 @@ function FileSelector({ label, onLoad }: { label?: string; onLoad: (data: FileDa
   }
 
   function processFiles() {
-    loadFiles(selectedFiles).then(onLoad)
+    loadFiles(selectedFiles).then(onLoad).then(() => setDisplayFiles(false))
+  }
+
+  if (!displayFiles) {
+    return <Box><Button
+      variant="contained"
+      component="label"
+      onClick={() => setDisplayFiles(true)}
+    >Select Files</Button>
+    </Box>
   }
 
   return <Box><Button
@@ -27,9 +37,12 @@ function FileSelector({ label, onLoad }: { label?: string; onLoad: (data: FileDa
       multiple
     />
   </Button>
-    {!!selectedFiles.length && <Box>
-      {selectedFiles.map((file, i) => <Box key={i}>{file.name}</Box>)}
-      <Box><Button onClick={processFiles}>{label || 'DoIt'}</Button></Box>
+    {!!selectedFiles.length && <Box border={'1px solid'} padding={'5px'}>
+      <Box>Selected Files:</Box>
+      <Box padding={'5px'}>
+        {selectedFiles.map((file, i) => <Box key={i}>{file.name}</Box>)}
+        <Box><Button onClick={processFiles}>{label || 'DoIt'}</Button></Box>
+      </Box>
     </Box>}
   </Box>
 }

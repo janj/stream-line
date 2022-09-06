@@ -1,6 +1,20 @@
 import { createMapping, IArtistMapping } from './artistMapping'
 import { createArtist, IArtist } from './artist'
 
+export type IArtistsByName = {
+  [name: string]: IArtist
+}
+
+export type IMappingsByName = {
+  [name: string]: IArtistMapping
+}
+
+interface INameSort {
+  artists: IArtistsByName
+  mapped: IMappingsByName
+  neither: string[]
+}
+
 export class ArtistsManager {
   artistsByName: {[name: string]: IArtist}
   mappingsByName: {[name: string]: IArtistMapping}
@@ -32,5 +46,18 @@ export class ArtistsManager {
   }
   mappingForName(name: string) {
     return this.mappingsByName[name]
+  }
+
+  sortNames(names: string[]) {
+    return names.reduce(({artists, mapped, neither}: INameSort, name) => {
+      if (this.artistsByName[name]) {
+        artists[name] = this.artistsByName[name]
+      } else if (this.mappingsByName[name]) {
+        mapped[name] = this.mappingsByName[name]
+      } else {
+        neither.push(name)
+      }
+      return {artists, mapped, neither}
+    }, {artists: {}, mapped: {}, neither: []})
   }
 }
