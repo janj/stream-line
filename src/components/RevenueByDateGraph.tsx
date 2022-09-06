@@ -1,4 +1,4 @@
-import { AmpSheetRow } from '../Types'
+import { StatementRow } from '../Types'
 import {
   CartesianGrid,
   Legend, Line,
@@ -10,7 +10,7 @@ import {
 } from 'recharts'
 import React from 'react'
 
-export default function RevenueByDateGraph({ datas }: { datas: {[key: string]: AmpSheetRow[]}}) {
+export default function RevenueByDateGraph({ datas }: { datas: {[key: string]: StatementRow[]}}) {
   const [chartData, setChartData] = React.useState<{ [kdy: string]: string }[]>()
   const [lines, setLines] = React.useState<{ [key: string]: string }>({})
 

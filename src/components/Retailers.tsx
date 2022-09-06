@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactApexChart from 'react-apexcharts'
-import { AmpSheetRow } from '../Types'
+import { StatementRow } from '../Types'
 import { getByRetailer } from './Helpers'
 import { ApexOptions } from 'apexcharts'
 import { Box } from '@material-ui/core'
 import Filters, { ALL, IFilters } from './Filters'
 
-export default function Retailers({ sheet }: { sheet: AmpSheetRow[] }) {
-  const [byRetailer, setByRetailer] = React.useState<{[retailer: string]: AmpSheetRow[]}>({})
+export default function Retailers({ sheet }: { sheet: StatementRow[] }) {
+  const [byRetailer, setByRetailer] = React.useState<{[retailer: string]: StatementRow[]}>({})
   const [currentSeries, setSeries] = React.useState<{ data: number[] }[]>([])
   const [currentCategories, setCategories] = React.useState<string[]>([])
   const [currentArtist, setCurrentArtist] = React.useState('')

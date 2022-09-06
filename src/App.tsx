@@ -1,18 +1,14 @@
 import React from 'react';
-import { Route, Switch } from "react-router-dom";
 import './App.css';
 import Home from './components/Home'
+import { Box } from '@material-ui/core'
 
 function App() {
   return (
-    <div className="App">
-      <Switch>
-        <Route exact path="/">
+    <Box className="App">
           <Home />
-        </Route>
-      </Switch>
-    </div>
-  );
+    </Box>
+  )
 }
 
-export default App;
+export default App

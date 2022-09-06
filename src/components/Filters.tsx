@@ -1,5 +1,5 @@
 import React from 'react'
-import { AmpSheetRow } from '../Types'
+import { StatementRow } from '../Types'
 import { Box, MenuItem, Select } from '@material-ui/core'
 
 export const ALL = 'all'
@@ -10,7 +10,7 @@ export interface IFilters {
   streamOrRevenue: string
 }
 
-export default function Filters({ sheet, onFiltersChanged }: { sheet: AmpSheetRow[], onFiltersChanged: (filters: IFilters) => void}) {
+export default function Filters({ sheet, onFiltersChanged }: { sheet: StatementRow[], onFiltersChanged: (filters: IFilters) => void}) {
   const [currentArtist, setCurrentArtist] = React.useState('')
   const [currentSeries, setCurrentSeries] = React.useState('')
   const [allArtists, setAllArtists] = React.useState<string[]>([])

@@ -1,27 +1,38 @@
-import React from 'react';
-import { AmpSheetRow } from '../Types'
-import { loadAMPsuite } from './Helpers'
-import FileSelector from './FileSelector'
+import React from 'react'
+import { StatementRow } from '../Types'
+import { StatementsSelector } from './FileSelector'
 import TrackDetails from './TrackDetails'
 import Retailers from './Retailers'
 import Locations from './Locations'
+import { Box } from '@material-ui/core'
+import { getMappings, IArtistMapping } from './artists/artistMapping'
+import { getArtists, mapArtists } from './artists/artist'
 
 export default function Home() {
-  const [sheet, setSheet] = React.useState<AmpSheetRow[]>([])
+  const [sheet, setSheet] = React.useState<StatementRow[]>([])
+  const [mappings, setMappings] = React.useState<{[name: string]: IArtistMapping}>()
 
-  function fileSelected(data: any) {
-    const rows: AmpSheetRow[] = []
-    Object.values(data).forEach((sheetData) => {
-      rows.push(...loadAMPsuite(sheetData))
+  React.useState(() => {
+    getArtists().then((allArtists) => {
+      getMappings(allArtists).then(setMappings)
     })
-    setSheet(rows)
+  })
+
+  if (!mappings) return <Box>Loading...</Box>
+
+  function onStatementsSelect(rows: StatementRow[]) {
+    if (!mappings) {
+      setSheet(rows)
+    } else {
+      setSheet(mapArtists(rows, mappings))
+    }
   }
 
-  return <div style={{ padding: 25 }}>
-    <div style={{ padding: 25 }}>
-      <FileSelector onLoad={fileSelected} />
-    </div>
-    {!!sheet.length && <div style={{ padding: 25, border: 'solid 1px' }}>
+  return <Box style={{ padding: 25 }}>
+    <Box style={{ padding: 25 }}>
+      <StatementsSelector onStatementsSelect={onStatementsSelect} />
+    </Box>
+    {!!sheet.length && <Box style={{ padding: 25, border: 'solid 1px' }}>
       Tracks
       <div style={{ padding: 25 }}>
         <TrackDetails sheet={sheet} />
@@ -34,7 +45,7 @@ export default function Home() {
       <div style={{ padding: 25 }}>
         <Locations sheet={sheet} />
       </div>
-    </div>
+    </Box>
     }
-  </div>
+  </Box>
 }
