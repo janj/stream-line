@@ -16,39 +16,11 @@ function toStatement(rowObj: {[key: string]: string}): StatementRow {
   return dataObj as unknown as StatementRow
 }
 
-const dataCols = [
-  'Period From',
-  'Period To',
-  'Transaction Data',
-  'Distributor',
-  'UPC',
-  'Cat. No.',
-  'ISRC',
-  'Label',
-  'Release Title',
-  'Track Title',
-  'Mix Name',
-  'Artist',
-  'Content Type',
-  'Delivery Method',
-  'Territory',
-  'Quantity',
-  'Revenue',
-  'Sales Start Date',
-  'Sales End Date',
-  'EAN/UPC',  // what is this
-  'Album Name',
-  'Track Name',
-  'Store',
-  'Country Name',
-  'Country ISO',
-  'Total Plays',
-  'Total Downloads',
-  'Amount',
-  'Amount Currency'
-]
-
 export function loadStatementFile(data: string): StatementRow[] {
+  const testCols = Object.values(statementColMap).reduce((acc: string[], cols) => {
+    acc.push(...cols)
+    return acc
+  }, [])
   const workbook = XLSX.read(data, {
     type: 'binary'
   });
@@ -60,7 +32,7 @@ export function loadStatementFile(data: string): StatementRow[] {
   testJson.split('\n').forEach((row, index) => {
     if (startIndex >= 0) return
     const fullCols = row.split(',').filter((h) => !!h)
-    const cols = fullCols.filter((col) => dataCols.includes(col))
+    const cols = fullCols.filter((col) => testCols.includes(col.toLowerCase()))
     if (cols.length > fullCols.length / 2) {
       startIndex = index
     }

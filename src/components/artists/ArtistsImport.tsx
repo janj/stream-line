@@ -32,14 +32,14 @@ export function ArtistsImport({manager, statementArtists}: {
 function ExistingArtists({ artists }: { artists: IArtistsByName }) {
   return <Box border={'solid 1px'} padding={'5px'}>
     <Box><b>Artists</b></Box>
-    <Box padding={'10px'}>{Object.values(artists).map((a) => <Box>{a.name}</Box>)}</Box>
+    <Box padding={'10px'}>{Object.values(artists).map((a, i) => <Box key={i}>{a.name}</Box>)}</Box>
   </Box>
 }
 
 function ExistingMappings({ mappings }: { mappings: IMappingsByName }) {
   return <Box border={'solid 1px'} padding={'5px'}>
     <Box><b>Mappings</b></Box>
-    <Box padding={'10px'}>{Object.values(mappings).map((m) => <Box>{m.name}<b>{' MAPPED TO: '}</b>{m.mappedTo.name}</Box>)}</Box>
+    <Box padding={'10px'}>{Object.values(mappings).map((m, i) => <Box key={i}>{m.name}<b>{' MAPPED TO: '}</b>{m.mappedTo.name}</Box>)}</Box>
   </Box>
 }
 
