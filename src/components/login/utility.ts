@@ -1,19 +1,35 @@
 import Parse from 'parse'
 
-export const doUserRegistration = async function ({ username, password}: {username: string; password: string}): Promise<boolean> {
-  // Note that these values come from state variables that we've declared before
-  const usernameValue: string = username
-  const passwordValue: string = password
+export type User = Parse.User
+
+export function getCurrentUser() {
+  return Parse.User.current()
+}
+
+export async function doUserRegistration({ username, password}: {
+  username: string
+  password: string
+}): Promise<User | undefined> {
   try {
-    // Since the signUp method returns a Promise, we need to call it using await
-    const createdUser: Parse.User = await Parse.User.signUp(usernameValue, passwordValue, {})
-    alert(
-      `Success! User ${createdUser.getUsername()} was successfully created!`,
-    )
-    return true
+    await Parse.User.signUp(username, password, {})
+    return await Parse.User.current()
   } catch (error: any) {
-    // signUp can fail if any parameter is blank or failed an uniqueness check on the server
     alert(`Error! ${error}`)
-    return false
   }
+}
+
+export async function doUserLogin({ username, password}: {
+  username: string
+  password: string
+}): Promise<User | undefined> {
+  try {
+    await Parse.User.logIn(username, password)
+    return await Parse.User.current()
+  } catch (error: any) {
+    alert(`Error! ${error}`)
+  }
+}
+
+export async function doUserLogout() {
+  return Parse.User.logOut()
 }
