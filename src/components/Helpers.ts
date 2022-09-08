@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx'
-import { statementColMap, StatementRow } from '../Types'
+import { statementColMap, StatementRow } from '../types/Types'
 
 function toStatement(rowObj: {[key: string]: string}): StatementRow {
   const dataObj: {[key: string]: string} = {}
@@ -16,7 +16,7 @@ function toStatement(rowObj: {[key: string]: string}): StatementRow {
   return dataObj as unknown as StatementRow
 }
 
-export function loadStatementFile(data: string): StatementRow[] {
+export function loadStatementFile(data: string): { sheetHeaders: string[]; rows: StatementRow[] } {
   const testCols = Object.values(statementColMap).reduce((acc: string[], cols) => {
     acc.push(...cols)
     return acc
@@ -28,6 +28,7 @@ export function loadStatementFile(data: string): StatementRow[] {
   const workSheet = workbook.Sheets[sheetName]
   const sheetRange = XLSX.utils.decode_range(workSheet['!ref']!)
   const testJson = XLSX.utils.sheet_to_csv(workSheet, { RS: '\n'})
+  const sheetHeaders: string[] = []
   let startIndex = -1
   testJson.split('\n').forEach((row, index) => {
     if (startIndex >= 0) return
@@ -35,6 +36,7 @@ export function loadStatementFile(data: string): StatementRow[] {
     const cols = fullCols.filter((col) => testCols.includes(col.toLowerCase()))
     if (cols.length > fullCols.length / 2) {
       startIndex = index
+      sheetHeaders.push(...fullCols)
     }
   })
   if (startIndex < 0) {
@@ -42,7 +44,8 @@ export function loadStatementFile(data: string): StatementRow[] {
   }
 
   const asJson = XLSX.utils.sheet_to_json<{[key: string]: string}>(workSheet, { range: { s: { c:0, r:startIndex }, e: sheetRange.e}})
-  return asJson.map(toStatement)
+  const rows = asJson.map(toStatement)
+  return { sheetHeaders, rows }
 }
 
 export function getByIsrc(data: StatementRow[]) {

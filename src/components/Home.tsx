@@ -1,6 +1,6 @@
 import React from 'react'
-import { StatementRow } from '../Types'
-import { StatementsSelector } from './FileSelector'
+import { StatementRow } from '../types/Types'
+import { StatementsData, StatementsSelector } from './FileSelector'
 import TrackDetails from './TrackDetails'
 import Retailers from './Retailers'
 import Locations from './Locations'
@@ -20,11 +20,15 @@ export default function Home() {
 
   if (!mappings) return <Box>Loading...</Box>
 
-  function onStatementsSelect(rows: StatementRow[]) {
+  function onStatementsSelect(data: StatementsData) {
+    const allRows = Object.values(data).reduce((acc: StatementRow[], { rows }) => {
+      acc.push(...rows)
+      return acc
+    }, [])
     if (!mappings) {
-      setSheet(rows)
+      setSheet(allRows)
     } else {
-      setSheet(mapArtists(rows, mappings))
+      setSheet(mapArtists(allRows, mappings))
     }
   }
 

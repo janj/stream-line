@@ -1,4 +1,4 @@
-import { StatementRow } from '../Types'
+import { StatementRow } from '../types/Types'
 import {
   CartesianGrid,
   Legend, Line,

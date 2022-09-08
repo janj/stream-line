@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactApexChart from 'react-apexcharts'
-import { StatementRow } from '../Types'
+import { StatementRow } from '../types/Types'
 import { getByRetailer } from './Helpers'
 import { ApexOptions } from 'apexcharts'
 import { Box } from '@material-ui/core'

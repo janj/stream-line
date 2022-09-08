@@ -1,6 +1,6 @@
 import Parse from 'parse'
 import { IParseObj, ParseObj } from '../parseObj'
-import { StatementRow } from '../../Types'
+import { StatementRow } from '../../types/Types'
 import { IArtistMapping } from './artistMapping'
 
 const className = 'Artist'

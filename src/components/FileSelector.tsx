@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button } from '@material-ui/core'
 import { FileData, loadFiles } from './statements/utility'
-import { StatementRow } from '../Types'
+import { StatementRow } from '../types/Types'
 import { loadStatementFile } from './Helpers'
 
 function FileSelector({ label, onLoad }: { label?: string; onLoad: (data: FileData) => void }) {
@@ -47,13 +47,25 @@ function FileSelector({ label, onLoad }: { label?: string; onLoad: (data: FileDa
   </Box>
 }
 
-export function StatementsSelector({onStatementsSelect, label}: {label?: string, onStatementsSelect: (rows: StatementRow[]) => void}) {
+export interface IStatementData {
+  rows: StatementRow[]
+  sheetHeaders: string[]
+}
+
+export type StatementsData = {
+  [fileName: string]: IStatementData
+}
+
+export function StatementsSelector({onStatementsSelect, label}: {
+  label?: string
+  onStatementsSelect: (data: StatementsData) => void
+}) {
   function onSelect(data: FileData) {
-    const asRows = Object.values(data).reduce((acc: StatementRow[], sheetData) => {
-      acc.push(...loadStatementFile(sheetData))
+    const sheetData = Object.entries(data).reduce((acc: StatementsData, [key, sheetData]) => {
+      acc[key] = loadStatementFile(sheetData)
       return acc
-    }, [])
-    onStatementsSelect(asRows)
+    }, {})
+    onStatementsSelect(sheetData)
   }
 
   return <FileSelector onLoad={onSelect} label={label} />

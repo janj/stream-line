@@ -1,4 +1,4 @@
-import { StatementRow } from '../../Types'
+import { StatementRow } from '../../types/Types'
 
 export type FileData = {
   [fileName: string]: string

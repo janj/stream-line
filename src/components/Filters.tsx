@@ -1,5 +1,5 @@
 import React from 'react'
-import { StatementRow } from '../Types'
+import { StatementRow } from '../types/Types'
 import { Box, MenuItem, Select } from '@material-ui/core'
 
 export const ALL = 'all'

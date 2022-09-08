@@ -1,5 +1,5 @@
 import { DataGrid, GridColDef, GridRowData, GridRowsProp } from '@material-ui/data-grid'
-import { StatementRow } from '../Types'
+import { StatementRow } from '../types/Types'
 import { getByIsrc } from './Helpers'
 
 export default function TrackDetails({ sheet }: { sheet: StatementRow[]}) {

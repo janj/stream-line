@@ -6,6 +6,7 @@ import { Box } from '@material-ui/core'
 import Login from './components/login/Login';
 import { Management } from './components/artists/Management';
 import Parse from 'parse'
+import { StatementsImport } from './components/statements/StatementsImport';
 
 function useQuery() {
   const { search } = useLocation();
@@ -14,10 +15,11 @@ function useQuery() {
 
 const componentMap = {
   login: Login,
-  artists: Management
+  artists: Management,
+  statements: StatementsImport
 }
 
-const userRequired = ['artists']
+const userRequired = ['artists', 'statements']
 
 function useComponent() {
   const queryParams = useQuery()

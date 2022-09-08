@@ -1,5 +1,5 @@
 import React from 'react'
-import { StatementRow } from '../Types'
+import { StatementRow } from '../types/Types'
 import { getByLocation } from './Helpers'
 import { ApexOptions } from 'apexcharts'
 import ReactApexChart from 'react-apexcharts'
