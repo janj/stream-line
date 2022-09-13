@@ -15,7 +15,7 @@ interface INameSort {
   neither: string[]
 }
 
-export function getManager() {
+export function getArtistsManager() {
   return getArtists().then((allArtists) => {
     return getMappings(allArtists).then((mappings) => {
       return new ArtistsManager(allArtists, mappings)

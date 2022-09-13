@@ -36,8 +36,8 @@ export const statementColMap: {[key: string]: string[]} = {
   UPC: [HL.upc, HL.eanUpc],
   CountryName: [HL.countryName],
   TotalDownloads: [HL.totalDownloads],
-  AmountCurrency: [HL.amountCurrency],
+  AmountCurrency: [HL.amountCurrency, HL.total],
 
-  Ignore: [HL.catNo, HL.suitebeatsComp]
+  Ignore: [HL.catNo, HL.suitebeatsComp, HL.royaltyDate, HL.split, HL.type, HL.source]
 }
 

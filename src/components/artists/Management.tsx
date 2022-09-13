@@ -4,14 +4,14 @@ import { StatementsData, StatementsSelector } from '../FileSelector'
 import { StatementRow } from '../../types/Types'
 import { artistsFromSheetData } from '../statements/utility'
 import { ArtistsImport } from './ArtistsImport'
-import { ArtistsManager, getManager } from './ArtistsManager'
+import { ArtistsManager, getArtistsManager } from './ArtistsManager'
 
 export function Management() {
   const [statementArtists, setStatementArtists] = React.useState<string[]>([])
   const [manager, setManager] = React.useState<ArtistsManager>()
 
   React.useEffect(() => {
-    getManager().then(setManager)
+    getArtistsManager().then(setManager)
   }, [])
 
   function statementImport(data: StatementsData) {

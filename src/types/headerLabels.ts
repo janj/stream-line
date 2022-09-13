@@ -31,7 +31,12 @@ export enum HL {
   countryName = 'country name',
   totalDownloads = 'total downloads',
   amountCurrency = 'amount currency',
+  total = 'total',
 
-  catNo = 'cat. no',
-  suitebeatsComp = 'suitebeats comp.'
+  catNo = 'cat. no.',
+  suitebeatsComp = 'suitebeats comp.',
+  royaltyDate = 'royalty date',
+  split = 'split',
+  type = 'type',
+  source = 'source'
 }

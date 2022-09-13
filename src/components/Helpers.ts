@@ -85,3 +85,11 @@ export function consolidateRvByDate(data: StatementRow[]) {
   })
   return byDate
 }
+
+export function arrayMatchSort<T>(toMatch: T[]) {
+  return (a: T[], b: T[]) => {
+    const aMatch = a.filter((item) => toMatch.includes(item)).length
+    const bMatch = b.filter((item) => toMatch.includes(item)).length
+    return bMatch - aMatch
+  }
+}
