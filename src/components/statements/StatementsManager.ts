@@ -74,24 +74,25 @@ export class StatementsManager {
   }
   
   addPlatformHeaders(platform: Platform, headers: string[]) {
+    const existing = this.platformHeaders[platform.id].map((hid) => this.headers[hid].label)
     const byLabel = Object.values(this.headers).reduce((acc: {[key: string]: StatementHeader}, header) => {
       acc[header.label] = header
       return acc
     }, {})
-    return headers.reduce((acc: StatementHeader[], header) => {
+    return headers.filter((h) => !existing.includes(h)).reduce((acc: StatementHeader[], header) => {
       const ph = byLabel[header]
       ph && acc.push(ph)
       return acc
-    }, []).reduce((acc, header, index, orig) => {
-      if (index === 0) {
-      }
+    }, []).reduce((acc, header) => {
       return acc.then(() => {
-        return createPlatformHeader(platform, header)
+        return createPlatformHeader(platform, header).then((newHeader) => {
+          this.platformHeaders[platform.id].push(newHeader.headerId)
+        })
       })
     }, Promise.resolve())
   }
-  
-  platformForHeaders(headers: string[]) {
+
+  platformIdForHeaders(headers: string[]) {
     const byLabel = Object.values(this.headers).reduce((acc: {[key: string]: StatementHeader}, header) => {
       acc[header.label] = header
       return acc
@@ -105,7 +106,12 @@ export class StatementsManager {
     const entrySort = ([_a, aIds]: [unknown, string[]], [_b, bIds]: [unknown, string[]]) => sortFunc(aIds, bIds)
     const [bestMatch] = Object.entries(this.platformHeaders).sort(entrySort)
     if (bestMatch) {
-      return this.platforms.find((p) => p.id === bestMatch[0])
+      const [id, ids] = bestMatch
+      const missing = headerIds.filter((id) => !ids.includes(id))
+      if (missing.length) {
+        return
+      }
+      return id
     }
   }
 }

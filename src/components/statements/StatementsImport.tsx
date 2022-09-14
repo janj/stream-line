@@ -42,9 +42,9 @@ function StatementImport({ name, data: { rows, sheetHeaders }, artistManager, st
     setStatementArtists(artistsFromSheetData(rows))
   }, [rows])
 
-  return <Box>
-    <Box>
-      <Button onClick={() => setShowDetails(!showDetails)}>{name}</Button>
+  return <Box padding={'10px'} border={'1px solix'}>
+    <Box style={{backgroundColor: 'lightGrey'}}>
+      <Button onClick={() => setShowDetails(!showDetails)}>{`File: ${name}`}</Button>
     </Box>
     {showDetails && <Box>
       <ArtistsImport manager={artistManager} statementArtists={statementArtists} />
@@ -62,11 +62,13 @@ function PlatformImport({ headers, statementsManager }: {
   const [showImport, setShowImport] = React.useState(false)
   const [selectedPlatform, setSelectedPlatform] = React.useState('')
   const [existingPlatforms, setExistingPlatforms] = React.useState<{[id: string]: Platform}>({})
+  const [foundPlatform, setFoundPlatform] = React.useState<string | undefined>()
 
   React.useEffect(() => {
     setMissingHeaders(statementsManager.getMissingHeaders(...headers))
-    const platform = statementsManager.platformForHeaders(headers)
-    setSelectedPlatform(platform?.id || '')
+    const platformId = statementsManager.platformIdForHeaders(headers)
+    setFoundPlatform(platformId)
+    setSelectedPlatform(platformId || '')
   }, [headers, statementsManager])
 
   React.useEffect(() => {
@@ -92,12 +94,13 @@ function PlatformImport({ headers, statementsManager }: {
   }
 
   return <Box>
-    <Box><Button onClick={() => setShowImport(!showImport)}>Platform</Button></Box>
+    <Box><Button onClick={() => setShowImport(!foundPlatform && !showImport)}>Platform</Button></Box>
     {showImport && <Box>
       <TextField value={newPlatform} onChange={({ target }) => setNewPlatform(target.value)}/>
       <Box>
         <ConfirmCommitButton onClick={addPlatform}>Add Platform</ConfirmCommitButton>
         <ConfirmCommitButton disabled={!selectedPlatform} onClick={importStatementHeaders}>Platform Headers</ConfirmCommitButton>
+        <Box>{missingHeaders.join(', ')}</Box>
       </Box>
       <Select
         value={selectedPlatform}
@@ -108,8 +111,11 @@ function PlatformImport({ headers, statementsManager }: {
         })}
       </Select>
     </Box>}
+    {foundPlatform && <Box>
+      {existingPlatforms[foundPlatform]?.name}
+    </Box>}
     {!!missingHeaders.length && <Box>
-      <Box>Missing Headers</Box>
+      <Box>Unrecognized Headers</Box>
       <Box>{missingHeaders.join(', ')}</Box>
       <Box><ConfirmCommitButton onClick={importHeaders}>Import Headers</ConfirmCommitButton></Box>
     </Box>}

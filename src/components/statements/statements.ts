@@ -48,7 +48,7 @@ export async function getPlatforms() {
 
 export async function createPlatformHeader(platform: Platform, header: StatementHeader) {
   const platformHeader = new Parse.Object(platformHeadersKey, { platform, header })
-  platformHeader.save().then((obj) => new PlatformHeader(obj))
+  return platformHeader.save().then((obj) => new PlatformHeader(obj))
 }
 
 export async function getPlatformHeaders() {
