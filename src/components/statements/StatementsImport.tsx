@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, MenuItem, Select, TextField } from '@material-ui/core'
 import { IStatementData, StatementsData, StatementsSelector } from '../FileSelector';
-import { artistsFromSheetData } from './utility';
+import { artistsFromSheetData, statementDatesFromRows } from './utility';
 import { ArtistsManager, getArtistsManager } from '../artists/ArtistsManager';
 import { ArtistsImport } from '../artists/ArtistsImport';
 import { ConfirmCommitButton } from '../utility/ConfirmCommitButton';
@@ -37,38 +37,60 @@ function StatementImport({ name, data: { rows, sheetHeaders }, artistManager, st
 }) {
   const [showDetails, setShowDetails] = React.useState(false)
   const [statementArtists, setStatementArtists] = React.useState<string[]>([])
+  const [dates, setDates] = React.useState<{fromDate?: string; toDate?: string}>({})
+  const [identifiedPlatform, setIdentifiedPlatform] = React.useState<string>()
 
   React.useEffect(() => {
     setStatementArtists(artistsFromSheetData(rows))
+    setDates(statementDatesFromRows(rows))
   }, [rows])
 
+  React.useEffect(() => {
+    const platformId = statementsManager.platformIdForHeaders(sheetHeaders)
+    setIdentifiedPlatform(platformId)
+  }, [sheetHeaders, statementsManager])
+
+  function importStatement() {
+    const artistNames = rows.map(({ Artist }) => Artist)
+    const { artists } = artistManager.sortNames(artistNames)
+    statementsManager.importStatementData({rows, sheetHeaders}, artists)
+  }
+
   return <Box padding={'10px'} border={'1px solix'}>
-    <Box style={{backgroundColor: 'lightGrey'}}>
+    <Box style={{backgroundColor: 'lightGrey'}} padding={'5px'}>
       <Button onClick={() => setShowDetails(!showDetails)}>{`File: ${name}`}</Button>
+      <Box>
+        {identifiedPlatform && <b>{statementsManager.platformForId(identifiedPlatform)?.name}</b>}
+        &nbsp;{rows.length} Rows
+        &nbsp;{statementArtists.length} Artists
+      </Box>
+      <Box>{`From ${dates.fromDate} To ${dates.toDate}`}</Box>
     </Box>
     {showDetails && <Box>
       <ArtistsImport manager={artistManager} statementArtists={statementArtists} />
-      <PlatformImport headers={sheetHeaders} statementsManager={statementsManager} />
+      <PlatformImport
+        headers={sheetHeaders}
+        statementsManager={statementsManager}
+        identifiedPlatform={identifiedPlatform || ''}
+      />
     </Box>}
+    {identifiedPlatform && <ConfirmCommitButton onClick={importStatement}>Import</ConfirmCommitButton>}
   </Box>
 }
 
-function PlatformImport({ headers, statementsManager }: {
+function PlatformImport({ headers, statementsManager, identifiedPlatform }: {
   headers: string[]
   statementsManager: StatementsManager
+  identifiedPlatform: string
 }) {
   const [missingHeaders, setMissingHeaders] = React.useState<string[]>([])
   const [newPlatform, setNewPlatform] = React.useState('')
   const [showImport, setShowImport] = React.useState(false)
-  const [selectedPlatform, setSelectedPlatform] = React.useState('')
+  const [selectedPlatform, setSelectedPlatform] = React.useState(identifiedPlatform)
   const [existingPlatforms, setExistingPlatforms] = React.useState<{[id: string]: Platform}>({})
-  const [foundPlatform, setFoundPlatform] = React.useState<string | undefined>()
 
   React.useEffect(() => {
     setMissingHeaders(statementsManager.getMissingHeaders(...headers))
-    const platformId = statementsManager.platformIdForHeaders(headers)
-    setFoundPlatform(platformId)
-    setSelectedPlatform(platformId || '')
   }, [headers, statementsManager])
 
   React.useEffect(() => {
@@ -94,7 +116,12 @@ function PlatformImport({ headers, statementsManager }: {
   }
 
   return <Box>
-    <Box><Button onClick={() => setShowImport(!foundPlatform && !showImport)}>Platform</Button></Box>
+    <Box>
+      <Button disabled={!!identifiedPlatform} onClick={() => setShowImport(!identifiedPlatform && !showImport)}>
+        Platform
+      </Button>
+      {!!identifiedPlatform && existingPlatforms[identifiedPlatform]?.name}
+    </Box>
     {showImport && <Box>
       <TextField value={newPlatform} onChange={({ target }) => setNewPlatform(target.value)}/>
       <Box>
@@ -110,9 +137,6 @@ function PlatformImport({ headers, statementsManager }: {
           return <MenuItem key={id} value={id}>{platform.name}</MenuItem>
         })}
       </Select>
-    </Box>}
-    {foundPlatform && <Box>
-      {existingPlatforms[foundPlatform]?.name}
     </Box>}
     {!!missingHeaders.length && <Box>
       <Box>Unrecognized Headers</Box>

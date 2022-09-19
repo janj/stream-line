@@ -3,10 +3,10 @@ import { HL } from "./headerLabels"
 export interface StatementRow {
   Artist: string
   ContentType: string
-  DeliveryMethod: string
+  DeliveryMethod: string  // not stored
   Distributor: string
   ISRC: string
-  Label: string
+  Label: string // not stored
   PeriodFrom: string
   PeriodTo: string
   Quantity: number
@@ -15,6 +15,7 @@ export interface StatementRow {
   Territory: string
   TrackTitle: string
   UPC: string
+  Date: string
 }
 
 export const statementColMap: {[key: string]: string[]} = {

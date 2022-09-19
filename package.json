@@ -53,8 +53,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.14.8",
-    "@babel/preset-env": "^7.14.9",
     "@types/parse": "^2.18.18",
     "@types/recharts": "^2.0.0"
   }

@@ -21,6 +21,14 @@ export async function getArtists() {
   return query.find().then((parseObjs) => parseObjs.map((obj) => new Artist(obj)))
 }
 
+export async function getArtistsById() {
+  const artists = await getArtists()
+  return artists.reduce((acc: {[id: string]: Artist}, artist) => {
+    acc[artist.id] = artist
+    return acc
+  }, {})
+}
+
 export async function createArtist({ name }: { name: string }) {
   const artist = new Parse.Object(className, { name })
   return artist.save().then((parseObj) => new Artist(parseObj))

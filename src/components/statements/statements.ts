@@ -46,6 +46,14 @@ export async function getPlatforms() {
   return query.find().then((parseObjs) => parseObjs.map((obj) => new Platform(obj)))
 }
 
+export async function getPlatformsById() {
+  const platforms = await getPlatforms()
+  return platforms.reduce((acc: {[id: string]: Platform}, platform) => {
+    acc[platform.id] = platform
+    return acc
+  }, {})
+}
+
 export async function createPlatformHeader(platform: Platform, header: StatementHeader) {
   const platformHeader = new Parse.Object(platformHeadersKey, { platform, header })
   return platformHeader.save().then((obj) => new PlatformHeader(obj))

@@ -1,3 +1,5 @@
+import { IArtistsByName } from "../artists/ArtistsManager";
+import { IStatementData } from "../FileSelector";
 import { arrayMatchSort } from "../Helpers";
 import {
   createHeader,
@@ -10,6 +12,7 @@ import {
   PlatformHeader,
   StatementHeader
 } from "./statements";
+import { createTransaction } from "./transactions";
 
 export function getStatementsManager() {
   return Promise.all([
@@ -113,5 +116,27 @@ export class StatementsManager {
       }
       return id
     }
+  }
+  
+  platformForId(platformId: string) {
+    return this.platforms.find((p) => p.id === platformId)
+  }
+
+  importStatementData({ rows, sheetHeaders }: IStatementData, artists: IArtistsByName) {
+    const platformId = this.platformIdForHeaders(sheetHeaders)
+    if (!platformId) return
+    const platform = this.platformForId(platformId) as Platform
+    const params = rows.map((row) => {
+      return {
+        platform,
+        artist: artists[row.Artist],
+        row
+      }
+    })
+    params.reduce((acc, params) => {
+      return acc.then(() => {
+        return createTransaction(params).then(() => {})
+      })
+    }, Promise.resolve())
   }
 }

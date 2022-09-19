@@ -22,7 +22,8 @@ export function loadStatementFile(data: string): { sheetHeaders: string[]; rows:
     return acc
   }, [])
   const workbook = XLSX.read(data, {
-    type: 'binary'
+    type: 'binary',
+    raw: true
   });
   const sheetName = workbook.SheetNames[0]
   const workSheet = workbook.Sheets[sheetName]

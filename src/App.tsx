@@ -7,6 +7,7 @@ import Login from './components/login/Login';
 import { Management } from './components/artists/Management';
 import Parse from 'parse'
 import { StatementsImport } from './components/statements/StatementsImport';
+import { TransactionsView } from './components/statements/TransactionsView';
 
 function useQuery() {
   const { search } = useLocation();
@@ -16,10 +17,11 @@ function useQuery() {
 const componentMap = {
   login: Login,
   artists: Management,
-  statements: StatementsImport
+  statements: StatementsImport,
+  transactions: TransactionsView
 }
 
-const userRequired = ['artists', 'statements']
+const userRequired = ['artists', 'statements', 'transactions']
 
 function useComponent() {
   const queryParams = useQuery()
