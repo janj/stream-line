@@ -3,7 +3,7 @@ import { StatementRow } from '../types/Types'
 import { getByLocation } from './Helpers'
 import { ApexOptions } from 'apexcharts'
 import ReactApexChart from 'react-apexcharts'
-import { Box } from '@material-ui/core'
+import { Box } from '@mui/material'
 import Filters, { ALL, IFilters } from './Filters'
 
 export default function Locations({ sheet }: { sheet: StatementRow[] }) {

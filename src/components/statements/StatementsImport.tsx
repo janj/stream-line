@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, MenuItem, Select, TextField } from '@material-ui/core'
+import { Box, Button, MenuItem, Select, TextField } from '@mui/material'
 import { IStatementData, StatementsData, StatementsSelector } from '../FileSelector';
 import { artistsFromSheetData, statementDatesFromRows } from './utility';
 import { ArtistsManager, getArtistsManager } from '../artists/ArtistsManager';

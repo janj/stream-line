@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, TextField } from '@material-ui/core'
+import { Box, Button, TextField } from '@mui/material'
 import { doUserLogin, doUserLogout, doUserRegistration, getCurrentUser, User } from './utility'
 
 export default function Login() {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box } from '@material-ui/core'
+import { Box } from '@mui/material'
 import { StatementsData, StatementsSelector } from '../FileSelector'
 import { StatementRow } from '../../types/Types'
 import { artistsFromSheetData } from '../statements/utility'

@@ -4,7 +4,7 @@ import { StatementsData, StatementsSelector } from './FileSelector'
 import TrackDetails from './TrackDetails'
 import Retailers from './Retailers'
 import Locations from './Locations'
-import { Box } from '@material-ui/core'
+import { Box } from '@mui/material'
 import { getMappings, IArtistMapping } from './artists/artistMapping'
 import { getArtists, mapArtists } from './artists/artist'
 

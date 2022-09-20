@@ -2,12 +2,14 @@ import React from 'react';
 import { useLocation } from 'react-router-dom'
 import './App.css';
 import Home from './components/Home'
-import { Box } from '@material-ui/core'
+import { Box } from '@mui/material'
 import Login from './components/login/Login';
 import { Management } from './components/artists/Management';
 import Parse from 'parse'
 import { StatementsImport } from './components/statements/StatementsImport';
 import { TransactionsView } from './components/statements/TransactionsView';
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 
 function useQuery() {
   const { search } = useLocation();
@@ -38,9 +40,11 @@ function useComponent() {
 function App() {
   const Component = useComponent()
   return (
-    <Box className="App" padding={'35px'}>
-      <Component />
-    </Box>
+    <LocalizationProvider dateAdapter={AdapterMoment}>
+      <Box className="App" padding={'35px'}>
+        <Component />
+      </Box>
+    </LocalizationProvider>
   )
 }
 

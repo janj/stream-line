@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, MenuItem, Select } from '@material-ui/core'
+import { Box, Button, MenuItem, Select } from '@mui/material'
 import { IArtist } from './artist'
 import { ArtistsManager, IArtistsByName, IMappingsByName } from './ArtistsManager'
 

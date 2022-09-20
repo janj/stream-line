@@ -1,6 +1,6 @@
 import React from 'react'
 import { StatementRow } from '../types/Types'
-import { Box, MenuItem, Select } from '@material-ui/core'
+import { Box, MenuItem, Select } from '@mui/material'
 
 export const ALL = 'all'
 const SERIES_TYPES = ['streams', 'revenue']

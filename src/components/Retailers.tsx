@@ -3,7 +3,7 @@ import ReactApexChart from 'react-apexcharts'
 import { StatementRow } from '../types/Types'
 import { getByRetailer } from './Helpers'
 import { ApexOptions } from 'apexcharts'
-import { Box } from '@material-ui/core'
+import { Box } from '@mui/material'
 import Filters, { ALL, IFilters } from './Filters'
 
 export default function Retailers({ sheet }: { sheet: StatementRow[] }) {
