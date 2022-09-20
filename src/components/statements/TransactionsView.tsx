@@ -24,34 +24,45 @@ export function TransactionsView() {
   const [manager, setManager] = React.useState<TransactionsManager>()
   const [transactions, setTransactions] = React.useState<Transaction[]>([])
   const [totalCount, setTotalCount] = React.useState(0)
+  const [startDate, setStartDate] = React.useState<Date>()
+  const [endDate, setEndDate] = React.useState<Date>()
 
   React.useEffect(() => {
     getTransactionManager().then((manager) => {
       setManager(manager)
-      manager.getTransactions().then(setTransactions)
+      manager.getTransactions().then((sorted) => {
+        const firstDate = sorted.find(({ date }) => !!date)?.date
+        const lastDate = sorted.pop()?.date
+        setStartDate(new Date(firstDate))
+        setEndDate(new Date(lastDate))
+        setTransactions(sorted)
+      })
     })
     getTransactionsCount().then(setTotalCount)
   }, [])
 
   return <Box>
     <Box padding={'10px'}>Transactions {totalCount}</Box>
-    <Box>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {cols.map(([label], i) => <TableCell key={i}>{label}</TableCell>)}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {transactions.map((t, i) => {
-              return <TableRow key={i}>
-                {cols.map(([_, transform], i) => <TableCell key={i}>{transform((t))}</TableCell>)}
-              </TableRow>
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+    {/*<StaticDateRangePicker />*/}
+    <TransactionsTable transactions={transactions} />
   </Box>
+}
+
+function TransactionsTable({ transactions }: { transactions: Transaction[] }) {
+  return <TableContainer>
+    <Table>
+      <TableHead>
+        <TableRow>
+          {cols.map(([label], i) => <TableCell key={i}>{label}</TableCell>)}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {transactions.map((t, i) => {
+          return <TableRow key={i}>
+            {cols.map(([_, transform], i) => <TableCell key={i}>{transform((t))}</TableCell>)}
+          </TableRow>
+        })}
+      </TableBody>
+    </Table>
+  </TableContainer>
 }

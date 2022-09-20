@@ -125,16 +125,35 @@ export async function getSortedTransactions(artists: {[id: string]: Artist}, pla
 //   console.log('transactionData', data)
 // }
 
-export async function getAllTransactions(artists: {[id: string]: Artist}, platforms: {[id: string]: Platform}) {
+const transactionLimit = 10000
+
+export async function getAllTransactions(
+  artists: {[id: string]: Artist},
+  platforms: {[id: string]: Platform},
+  skip: number = 0
+): Promise<Transaction[]> {
   const user = Parse.User.current
-  const query = new Parse.Query(transactionKey).equalTo('user', user).ascending('date').limit(1000)
-  return query.find().then((parseObjs) => parseObjs.map((parseObj) => {
-    const artistObj = parseObj.get('artist')
-    let artist: Artist | undefined
-    if (artistObj) artist = artists[artistObj.parseObj.id]
-    const platform = platforms[parseObj.get('platform').parseObj.id]
-    return new Transaction({ parseObj, artist, platform })
-  }))
+  const query = new Parse.Query(transactionKey)
+    .equalTo('user', user)
+    .ascending('date').limit(transactionLimit)
+    .skip(skip)
+  return query.find().then((parseObjs) => {
+    const transactions = parseObjs.map((parseObj, i, orig) => {
+      if (i === 0) console.log(orig.length)
+      const artistObj = parseObj.get('artist')
+      let artist: Artist | undefined
+      if (artistObj) artist = artists[artistObj.parseObj.id]
+      const platform = platforms[parseObj.get('platform').parseObj.id]
+      return new Transaction({ parseObj, artist, platform })
+    })
+    if (transactions.length < skip + transactionLimit) {
+      return transactions
+    }
+    return getAllTransactions(artists, platforms, transactions.length).then((rest) => {
+      transactions.push(...rest)
+      return transactions
+    })
+  })
 }
 
 export async function getTransactionsCount() {
