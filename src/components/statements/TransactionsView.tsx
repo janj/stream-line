@@ -1,6 +1,7 @@
-import React from 'react';
+import React from 'react'
 import {
   Box,
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -11,7 +12,6 @@ import {
 import { getTransactionsCount, Transaction } from './transactions'
 import { getTransactionManager, TransactionsManager } from './TransactionsManager'
 import { DatePicker } from '@mui/x-date-pickers'
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 const cols: [string, (t: Transaction) => string][] = [
   ['Date', ({ date }) => date],
@@ -22,14 +22,62 @@ const cols: [string, (t: Transaction) => string][] = [
   ['Revenue', ({ revenue }) => revenue]
 ]
 
+
+function Pagination({
+  total,
+  batchSize = 100,
+  onRangeChange
+}: {
+  total: number
+  batchSize?: number
+  onRangeChange: (r: { start: number; end: number }) => void
+}) {
+  const [currentIndex, setCurrentIndex] = React.useState(0)
+
+  const getEnd = () => {
+    return Math.min(currentIndex + batchSize, total)
+  }
+
+  React.useEffect(() => {
+    setCurrentIndex(0)
+  }, [total])
+
+  React.useEffect(() => {
+    onRangeChange({
+      start: currentIndex,
+      end: getEnd()
+    })
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [currentIndex])
+
+  const goNext = () => {
+    if (total < currentIndex + batchSize) return
+    setCurrentIndex(currentIndex + batchSize)
+  }
+
+  const goPrev = () => {
+    const prev = Math.max(0, currentIndex - batchSize)
+    setCurrentIndex(prev)
+  }
+  return (
+    <Box>
+      <Button onClick={goPrev}>{'<'}</Button>
+      {`${currentIndex} to ${getEnd()} of ${total}`}
+      <Button onClick={goNext}>{'>'}</Button>
+    </Box>
+  )
+}
+
+
 export function TransactionsView() {
   const [manager, setManager] = React.useState<TransactionsManager>()
   const [transactions, setTransactions] = React.useState<Transaction[]>([])
   const [totalCount, setTotalCount] = React.useState(0)
   const [minDate, setMinDate] = React.useState<Date>()
   const [maxDate, setMaxDate] = React.useState<Date>()
-  const [startDate, setStartDate] = React.useState<Date>()
-  const [endDate, setEndDate] = React.useState<Date>()
+  const [startDate, setStartDate] = React.useState<Date | null>()
+  const [endDate, setEndDate] = React.useState<Date | null>()
+  const [currentSet, setCurrenctSet] = React.useState<Transaction[]>([])
 
   React.useEffect(() => {
     getTransactionManager().then((manager) => {
@@ -37,15 +85,39 @@ export function TransactionsView() {
       manager.getTransactions().then((sorted) => {
         const firstDate = sorted.find(({ date }) => !!date)?.date
         const lastDate = sorted.pop()?.date
-        setMinDate(new Date(firstDate))
-        setMaxDate(new Date(lastDate))
-        setStartDate(new Date(firstDate))
-        setEndDate(new Date(lastDate))
+        setMinDate(firstDate)
+        setMaxDate(lastDate)
+        setStartDate(firstDate)
+        setEndDate(lastDate)
         setTransactions(sorted)
       })
     })
     getTransactionsCount().then(setTotalCount)
   }, [])
+
+  React.useEffect(() => {
+    let startIndex = 0
+    if (startDate) {
+      const first = transactions.find(({ date }) => {
+        const asDate = new Date(date)
+        return asDate >= startDate
+      })
+      if (first) {
+        startIndex = transactions.indexOf(first)
+      }
+    }
+    let endIndex = transactions.length - 1
+    if (endDate) {
+      const last = transactions.slice().reverse().find(({ date }) => {
+        const asDate = new Date(date)
+        return asDate <= endDate
+      })
+      if (last) {
+        endIndex = transactions.indexOf(last)
+      }
+    }
+    setCurrenctSet(transactions.slice(startIndex, endIndex))
+  }, [startDate, endDate])
 
   return <Box>
     <Box padding={'10px'}>Transactions {totalCount}</Box>
@@ -53,15 +125,26 @@ export function TransactionsView() {
       value={startDate}
       minDate={minDate}
       maxDate={maxDate}
-      onChange={(e) => console.log(e)}
+      onChange={setStartDate}
       renderInput={(params) => <TextField {...params} />}
     />
-    <TransactionsTable transactions={transactions} />
+    To
+    <DatePicker
+      value={endDate}
+      minDate={minDate}
+      maxDate={maxDate}
+      onChange={setEndDate}
+      renderInput={(params) => <TextField {...params} />}
+    />
+    <TransactionsTable transactions={currentSet} />
   </Box>
 }
 
 function TransactionsTable({ transactions }: { transactions: Transaction[] }) {
-  return <TableContainer>
+  const [range, setRange] = React.useState({start: 0, end: transactions.length})
+  return <Box>
+    <Pagination total={transactions.length} onRangeChange={setRange} />
+    <TableContainer>
     <Table>
       <TableHead>
         <TableRow>
@@ -69,7 +152,7 @@ function TransactionsTable({ transactions }: { transactions: Transaction[] }) {
         </TableRow>
       </TableHead>
       <TableBody>
-        {transactions.map((t, i) => {
+        {transactions.slice(range.start, range.end).map((t, i) => {
           return <TableRow key={i}>
             {cols.map(([_, transform], i) => <TableCell key={i}>{transform((t))}</TableCell>)}
           </TableRow>
@@ -77,4 +160,5 @@ function TransactionsTable({ transactions }: { transactions: Transaction[] }) {
       </TableBody>
     </Table>
   </TableContainer>
+  </Box>
 }
