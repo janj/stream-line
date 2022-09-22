@@ -1,72 +1,12 @@
 import React from 'react'
 import {
   Box,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow, TextField
+  TextField
 } from '@mui/material'
 import { getTransactionsCount, Transaction } from './transactions'
 import { getTransactionManager, TransactionsManager } from './TransactionsManager'
 import { DatePicker } from '@mui/x-date-pickers'
-
-const cols: [string, (t: Transaction) => string][] = [
-  ['Date', ({ date }) => date],
-  ['Artist', ({ artist }) => artist?.name],
-  ['Platform', ({ platform }) => platform?.name],
-  ['Quantity', ({ quantity }) => quantity],
-  ['Track', ({ trackTitle }) => trackTitle],
-  ['Revenue', ({ revenue }) => revenue]
-]
-
-
-function Pagination({
-  total,
-  batchSize = 100,
-  onRangeChange
-}: {
-  total: number
-  batchSize?: number
-  onRangeChange: (r: { start: number; end: number }) => void
-}) {
-  const [currentIndex, setCurrentIndex] = React.useState(0)
-
-  const getEnd = () => {
-    return Math.min(currentIndex + batchSize, total)
-  }
-
-  React.useEffect(() => {
-    setCurrentIndex(0)
-  }, [total])
-
-  React.useEffect(() => {
-    onRangeChange({
-      start: currentIndex,
-      end: getEnd()
-    })
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [currentIndex])
-
-  const goNext = () => {
-    if (total < currentIndex + batchSize) return
-    setCurrentIndex(currentIndex + batchSize)
-  }
-
-  const goPrev = () => {
-    const prev = Math.max(0, currentIndex - batchSize)
-    setCurrentIndex(prev)
-  }
-  return (
-    <Box>
-      <Button onClick={goPrev}>{'<'}</Button>
-      {`${currentIndex} to ${getEnd()} of ${total}`}
-      <Button onClick={goNext}>{'>'}</Button>
-    </Box>
-  )
-}
+import { TransactionsTable } from '../transactionViews/Table'
 
 
 export function TransactionsView() {
@@ -117,7 +57,7 @@ export function TransactionsView() {
       }
     }
     setCurrenctSet(transactions.slice(startIndex, endIndex))
-  }, [startDate, endDate])
+  }, [startDate, endDate, transactions, setCurrenctSet])
 
   return <Box>
     <Box padding={'10px'}>Transactions {totalCount}</Box>
@@ -137,28 +77,5 @@ export function TransactionsView() {
       renderInput={(params) => <TextField {...params} />}
     />
     <TransactionsTable transactions={currentSet} />
-  </Box>
-}
-
-function TransactionsTable({ transactions }: { transactions: Transaction[] }) {
-  const [range, setRange] = React.useState({start: 0, end: transactions.length})
-  return <Box>
-    <Pagination total={transactions.length} onRangeChange={setRange} />
-    <TableContainer>
-    <Table>
-      <TableHead>
-        <TableRow>
-          {cols.map(([label], i) => <TableCell key={i}>{label}</TableCell>)}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {transactions.slice(range.start, range.end).map((t, i) => {
-          return <TableRow key={i}>
-            {cols.map(([_, transform], i) => <TableCell key={i}>{transform((t))}</TableCell>)}
-          </TableRow>
-        })}
-      </TableBody>
-    </Table>
-  </TableContainer>
   </Box>
 }

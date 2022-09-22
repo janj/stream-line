@@ -1,7 +1,7 @@
 import React from 'react'
 import { StatementRow } from '../types/Types'
 import { StatementsData, StatementsSelector } from './FileSelector'
-import TrackDetails from './TrackDetails'
+import TrackDetails from './transactionViews/TrackDetails'
 import Retailers from './Retailers'
 import Locations from './Locations'
 import { Box } from '@mui/material'

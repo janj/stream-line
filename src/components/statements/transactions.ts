@@ -56,6 +56,12 @@ export class Transaction  extends ParseObj {
   get revenue() {
     return this.parseObj.get('revenue')
   }
+  get artistName() {
+    return this.artist?.name
+  }
+  get platformName() {
+    return this.platform.name
+  }
 }
 
 export function createTransaction({ platform, artist, row }: {
