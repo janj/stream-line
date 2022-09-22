@@ -9,8 +9,8 @@ const cols: GridColDef[] = [
   { field: 'revenue', headerName: 'Revenue', width: 150 }
 ]
 
-export default function TrackDetails({ sheet }: { sheet: ITransactionData[]}) {
-  const byIsrc = getByIsrc(sheet)
+export default function TrackDetails({ transactions }: { transactions: ITransactionData[]}) {
+  const byIsrc = getByIsrc(transactions)
   const rows: GridRowsProp = Object.keys(byIsrc).map((isrc, i) => {
     const data: GridRowData = { id: i }
     byIsrc[isrc].forEach((track) => {

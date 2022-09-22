@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactApexChart from 'react-apexcharts'
-import { getByRetailer } from './Helpers'
+import { getByRetailer } from '../Helpers'
 import { ApexOptions } from 'apexcharts'
 import { Box } from '@mui/material'
-import Filters, { ALL, IFilters } from './Filters'
-import { ITransactionData } from '../types/Types'
+import Filters, { ALL, IFilters } from '../Filters'
+import { ITransactionData } from '../../types/Types'
 
-export default function Retailers({ sheet }: { sheet: ITransactionData[] }) {
+export default function Retailers({ transactions }: { transactions: ITransactionData[] }) {
   const [byRetailer, setByRetailer] = React.useState<{[retailer: string]: ITransactionData[]}>({})
   const [currentSeries, setSeries] = React.useState<{ data: number[] }[]>([])
   const [currentCategories, setCategories] = React.useState<string[]>([])
@@ -15,14 +15,14 @@ export default function Retailers({ sheet }: { sheet: ITransactionData[] }) {
   const [selectedSeries, setSelectedSeries] = React.useState('')
 
   React.useEffect(() => {
-    const byRetailer = getByRetailer(sheet)
+    const byRetailer = getByRetailer(transactions)
     const categories: string[] = []
     Object.keys(byRetailer).forEach((retailer) => {
       categories.push(retailer)
     })
     setByRetailer(byRetailer)
     setCategories(categories)
-  }, [sheet])
+  }, [transactions])
 
   React.useEffect(() => {
     const revenue: number[] = []
@@ -73,7 +73,7 @@ export default function Retailers({ sheet }: { sheet: ITransactionData[] }) {
     }
   }
   return <Box>
-    <Filters sheet={sheet} onFiltersChanged={onFilterChange} />
+    <Filters sheet={transactions} onFiltersChanged={onFilterChange} />
     <ReactApexChart options={options} series={currentSeries} type="bar" height={350} />
   </Box>
 }

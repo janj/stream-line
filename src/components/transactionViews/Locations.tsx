@@ -1,12 +1,12 @@
 import React from 'react'
-import { getByLocation } from './Helpers'
+import { getByLocation } from '../Helpers'
 import { ApexOptions } from 'apexcharts'
 import ReactApexChart from 'react-apexcharts'
 import { Box } from '@mui/material'
-import Filters, { ALL, IFilters } from './Filters'
-import { ITransactionData } from '../types/Types'
+import Filters, { ALL, IFilters } from '../Filters'
+import { ITransactionData } from '../../types/Types'
 
-export default function Locations({ sheet }: { sheet: ITransactionData[] }) {
+export default function Locations({ transactions }: { transactions: ITransactionData[] }) {
   const [byLocation, setByLocation] = React.useState<{ [location: string]: ITransactionData[]}>({})
   const [locations, setLocations] = React.useState<string[]>([])
   const [currentArtist, setCurrentArtist] = React.useState('')
@@ -15,10 +15,10 @@ export default function Locations({ sheet }: { sheet: ITransactionData[] }) {
   const [availableSeries, setAvailableSeries] = React.useState<{[label: string]: number[]}>({})
 
   React.useEffect(() => {
-    const byLocation = getByLocation(sheet)
+    const byLocation = getByLocation(transactions)
     setLocations(Object.keys(byLocation))
     setByLocation(byLocation)
-  }, [sheet])
+  }, [transactions])
 
   React.useEffect(() => {
     const revenue: number[] = []
@@ -68,7 +68,7 @@ export default function Locations({ sheet }: { sheet: ITransactionData[] }) {
   })
 
   return <Box>
-    <Filters sheet={sheet} onFiltersChanged={onFilterChange} />
+    <Filters sheet={transactions} onFiltersChanged={onFilterChange} />
     <ReactApexChart options={options()} series={data} type="donut" height={350 + Math.floor(Math.random() * 2) + 1} />
   </Box>
 }

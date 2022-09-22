@@ -2,8 +2,8 @@ import React from 'react'
 import { ITransactionData, StatementRow } from '../types/Types'
 import { StatementsData, StatementsSelector } from './FileSelector'
 import TrackDetails from './transactionViews/TrackDetails'
-import Retailers from './Retailers'
-import Locations from './Locations'
+import Retailers from './transactionViews/Retailers'
+import Locations from './transactionViews/Locations'
 import { Box } from '@mui/material'
 import { getMappings, IArtistMapping } from './artists/artistMapping'
 import { getArtists } from './artists/artist'
@@ -59,15 +59,15 @@ export default function Home() {
     {!!sheet.length && <Box style={{ padding: 25, border: 'solid 1px' }}>
       Tracks
       <div style={{ padding: 25 }}>
-        <TrackDetails sheet={sheet} />
+        <TrackDetails transactions={sheet} />
       </div>
       Retailers
       <div style={{ padding: 25 }}>
-        <Retailers sheet={sheet} />
+        <Retailers transactions={sheet} />
       </div>
       Locations
       <div style={{ padding: 25 }}>
-        <Locations sheet={sheet} />
+        <Locations transactions={sheet} />
       </div>
     </Box>
     }

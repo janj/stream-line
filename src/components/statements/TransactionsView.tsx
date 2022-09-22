@@ -7,6 +7,9 @@ import { getTransactionsCount, Transaction } from './transactions'
 import { getTransactionManager, TransactionsManager } from './TransactionsManager'
 import { DatePicker } from '@mui/x-date-pickers'
 import { TransactionsTable } from '../transactionViews/Table'
+import TrackDetails from '../transactionViews/TrackDetails'
+import Locations from '../transactionViews/Locations'
+import Retailers from '../transactionViews/Retailers'
 
 
 export function TransactionsView() {
@@ -76,6 +79,17 @@ export function TransactionsView() {
       onChange={setEndDate}
       renderInput={(params) => <TextField {...params} />}
     />
-    <TransactionsTable transactions={currentSet} />
+    <Box style={{ padding: 25, border: 'solid 1px' }}>
+      {[
+        ['All Transactions', TransactionsTable],
+        ['Tracks', TrackDetails],
+        ['Locations', Locations],
+        ['Retailers', Retailers]
+      ].map(([label, Component]) => <Box padding={'25px'}>
+        <Box padding={'5px'}><b>{label}</b></Box>
+        <Component transactions={currentSet} />
+      </Box>)
+      }
+    </Box>
   </Box>
 }
