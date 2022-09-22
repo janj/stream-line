@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactApexChart from 'react-apexcharts'
-import { StatementRow } from '../types/Types'
 import { getByRetailer } from './Helpers'
 import { ApexOptions } from 'apexcharts'
 import { Box } from '@mui/material'
 import Filters, { ALL, IFilters } from './Filters'
+import { ITransactionData } from '../types/Types'
 
-export default function Retailers({ sheet }: { sheet: StatementRow[] }) {
-  const [byRetailer, setByRetailer] = React.useState<{[retailer: string]: StatementRow[]}>({})
+export default function Retailers({ sheet }: { sheet: ITransactionData[] }) {
+  const [byRetailer, setByRetailer] = React.useState<{[retailer: string]: ITransactionData[]}>({})
   const [currentSeries, setSeries] = React.useState<{ data: number[] }[]>([])
   const [currentCategories, setCategories] = React.useState<string[]>([])
   const [currentArtist, setCurrentArtist] = React.useState('')
@@ -31,9 +31,9 @@ export default function Retailers({ sheet }: { sheet: StatementRow[] }) {
       let revTotal = 0
       let streamTotal = 0
       byRetailer[retailer].forEach((track) => {
-        if (currentArtist === ALL || currentArtist === track.Artist) {
-          revTotal += track.Revenue
-          streamTotal += track.Quantity
+        if (currentArtist === ALL || currentArtist === track.artistName) {
+          revTotal += track.revenue
+          streamTotal += track.quantity
         }
       })
       revenue.push(revTotal)

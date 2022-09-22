@@ -1,13 +1,13 @@
 import React from 'react'
-import { StatementRow } from '../types/Types'
 import { getByLocation } from './Helpers'
 import { ApexOptions } from 'apexcharts'
 import ReactApexChart from 'react-apexcharts'
 import { Box } from '@mui/material'
 import Filters, { ALL, IFilters } from './Filters'
+import { ITransactionData } from '../types/Types'
 
-export default function Locations({ sheet }: { sheet: StatementRow[] }) {
-  const [byLocation, setByLocation] = React.useState<{ [location: string]: StatementRow[]}>({})
+export default function Locations({ sheet }: { sheet: ITransactionData[] }) {
+  const [byLocation, setByLocation] = React.useState<{ [location: string]: ITransactionData[]}>({})
   const [locations, setLocations] = React.useState<string[]>([])
   const [currentArtist, setCurrentArtist] = React.useState('')
   const [selectedSeries, setSelectedSeries] = React.useState('')
@@ -27,9 +27,9 @@ export default function Locations({ sheet }: { sheet: StatementRow[] }) {
       let revTotal = 0
       let streamTotal = 0
       byLocation[retailer].forEach((track) => {
-        if (currentArtist === ALL || currentArtist === track.Artist) {
-          revTotal += track.Revenue
-          streamTotal += track.Quantity
+        if (currentArtist === ALL || currentArtist === track.artistName) {
+          revTotal += +track.revenue
+          streamTotal += +track.quantity
         }
       })
       revenue.push(revTotal)

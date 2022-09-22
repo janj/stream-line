@@ -1,15 +1,35 @@
 import React from 'react'
-import { StatementRow } from '../types/Types'
+import { ITransactionData, StatementRow } from '../types/Types'
 import { StatementsData, StatementsSelector } from './FileSelector'
 import TrackDetails from './transactionViews/TrackDetails'
 import Retailers from './Retailers'
 import Locations from './Locations'
 import { Box } from '@mui/material'
 import { getMappings, IArtistMapping } from './artists/artistMapping'
-import { getArtists, mapArtists } from './artists/artist'
+import { getArtists } from './artists/artist'
+
+function toTransactionData(statementRow: StatementRow): ITransactionData {
+  return {
+    artistName: statementRow.Artist,
+    platformName: statementRow.Distributor,
+    trackTitle: statementRow.TrackTitle,
+    date: statementRow.Date,
+    revenue: +statementRow.Revenue,
+    isrc: statementRow.ISRC,
+    territory: statementRow.Territory,
+    quantity: +statementRow.Quantity
+  }
+}
+
+function mapArtists(rows: StatementRow[], mapping: {[name: string]: IArtistMapping}) {
+  return rows.map((row) => {
+    row.Artist = mapping[row.Artist]?.mappedTo.name || row.Artist
+    return row
+  }).map(toTransactionData)
+}
 
 export default function Home() {
-  const [sheet, setSheet] = React.useState<StatementRow[]>([])
+  const [sheet, setSheet] = React.useState<ITransactionData[]>([])
   const [mappings, setMappings] = React.useState<{[name: string]: IArtistMapping}>()
 
   React.useState(() => {
@@ -26,7 +46,7 @@ export default function Home() {
       return acc
     }, [])
     if (!mappings) {
-      setSheet(allRows)
+      setSheet(allRows.map(toTransactionData))
     } else {
       setSheet(mapArtists(allRows, mappings))
     }

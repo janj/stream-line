@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx'
-import { statementColMap, StatementRow } from '../types/Types'
+import { ITransactionData, statementColMap, StatementRow } from '../types/Types'
 
 function toStatement(rowObj: {[key: string]: string}): StatementRow {
   const dataObj: {[key: string]: string} = {}
@@ -49,42 +49,25 @@ export function loadStatementFile(data: string): { sheetHeaders: string[]; rows:
   return { sheetHeaders, rows }
 }
 
-export function getByIsrc(data: StatementRow[]) {
-  return getMultiByKeyProp('ISRC', data)
+export function getByIsrc(data: ITransactionData[]) {
+  return getMultiByKeyProp('isrc', data)
 }
 
-export function getByTerritory(data: StatementRow[]) {
-  return getMultiByKeyProp('Territory', data)
+export function getByRetailer(data: ITransactionData[]) {
+  return getMultiByKeyProp('platformName', data)
 }
 
-export function getByArtist(data: StatementRow[]) {
-  return getMultiByKeyProp('Artist', data)
+export function getByLocation(data: ITransactionData[]) {
+  return getMultiByKeyProp('territory', data)
 }
 
-export function getByRetailer(data: StatementRow[]) {
-  return getMultiByKeyProp('Distributor', data)
-}
-
-export function getByLocation(data: StatementRow[]) {
-  return getMultiByKeyProp('Territory', data)
-}
-
-export function getMultiByKeyProp(key: keyof StatementRow, data: StatementRow[]) {
-  const byKeyProp: {[key: string]: StatementRow[]} = {}
+export function getMultiByKeyProp(key: keyof ITransactionData, data: ITransactionData[]) {
+  const byKeyProp: {[key: string]: ITransactionData[]} = {}
   data.forEach((row) => {
     !byKeyProp[row[key]] && (byKeyProp[row[key]] = [])
     byKeyProp[row[key]].push(row)
   })
   return byKeyProp
-}
-
-export function consolidateRvByDate(data: StatementRow[]) {
-  const byDate: { [key: string]: number } = {}
-  data?.forEach((d) => {
-    !byDate[d.PeriodTo] && (byDate[d.PeriodTo] = 0)
-    byDate[d.PeriodTo] += d.Revenue
-  })
-  return byDate
 }
 
 export function arrayMatchSort<T>(toMatch: T[]) {

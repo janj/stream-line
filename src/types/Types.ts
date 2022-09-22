@@ -42,3 +42,13 @@ export const statementColMap: {[key: string]: string[]} = {
   Ignore: [HL.catNo, HL.suitebeatsComp, HL.royaltyDate, HL.split, HL.type, HL.source]
 }
 
+export interface ITransactionData {
+  date: string
+  artistName: string
+  platformName: string
+  quantity: number
+  trackTitle: string
+  revenue: number
+  isrc: string
+  territory: string
+}
