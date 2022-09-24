@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, MenuItem, Select } from '@material-ui/core'
+import { Box, Button, MenuItem, Select } from '@mui/material'
 import { IArtist } from './artist'
 import { ArtistsManager, IArtistsByName, IMappingsByName } from './ArtistsManager'
 
@@ -37,6 +37,7 @@ function ExistingArtists({ artists }: { artists: IArtistsByName }) {
 }
 
 function ExistingMappings({ mappings }: { mappings: IMappingsByName }) {
+  if (!Object.keys(mappings).length) return null
   return <Box border={'solid 1px'} padding={'5px'}>
     <Box><b>Mappings</b></Box>
     <Box padding={'10px'}>{Object.values(mappings).map((m, i) => <Box key={i}>{m.name}<b>{' MAPPED TO: '}</b>{m.mappedTo.name}</Box>)}</Box>
@@ -44,6 +45,7 @@ function ExistingMappings({ mappings }: { mappings: IMappingsByName }) {
 }
 
 function UnknownArtists({ names, manager, onUpdate }: { names: string[]; manager: ArtistsManager; onUpdate: () => void }) {
+  if (!names.length) return null
   return <Box border={'solid 1px'} padding={'5px'}>
     <Box><b>Unknown Artists</b></Box>
     <Box padding={'10px'}>{names.map((name) => <ArtistImport manager={manager} name={name} onUpdate={onUpdate}/>)}</Box>

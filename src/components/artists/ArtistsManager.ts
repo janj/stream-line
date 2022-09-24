@@ -1,5 +1,5 @@
-import { createMapping, IArtistMapping } from './artistMapping'
-import { createArtist, IArtist } from './artist'
+import { createMapping, getMappings, IArtistMapping } from './artistMapping'
+import { createArtist, getArtists, IArtist } from './artist'
 
 export type IArtistsByName = {
   [name: string]: IArtist
@@ -13,6 +13,14 @@ interface INameSort {
   artists: IArtistsByName
   mapped: IMappingsByName
   neither: string[]
+}
+
+export function getArtistsManager() {
+  return getArtists().then((allArtists) => {
+    return getMappings(allArtists).then((mappings) => {
+      return new ArtistsManager(allArtists, mappings)
+    })
+  })
 }
 
 export class ArtistsManager {

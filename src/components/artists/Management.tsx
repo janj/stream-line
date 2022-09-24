@@ -1,27 +1,25 @@
 import React from 'react'
-import { Box } from '@material-ui/core'
-import { StatementsSelector } from '../FileSelector'
-import { StatementRow } from '../../Types'
+import { Box } from '@mui/material'
+import { StatementsData, StatementsSelector } from '../FileSelector'
+import { StatementRow } from '../../types/Types'
 import { artistsFromSheetData } from '../statements/utility'
 import { ArtistsImport } from './ArtistsImport'
-import { getArtists } from './artist'
-import { getMappings } from './artistMapping'
-import { ArtistsManager } from './ArtistsManager'
+import { ArtistsManager, getArtistsManager } from './ArtistsManager'
 
 export function Management() {
   const [statementArtists, setStatementArtists] = React.useState<string[]>([])
   const [manager, setManager] = React.useState<ArtistsManager>()
 
   React.useEffect(() => {
-    getArtists().then((allArtists) => {
-      return getMappings(allArtists).then((mappings) => {
-        setManager(new ArtistsManager(allArtists, mappings))
-      })
-    })
+    getArtistsManager().then(setManager)
   }, [])
 
-  function statementImport(data: StatementRow[]) {
-    setStatementArtists(artistsFromSheetData(data))
+  function statementImport(data: StatementsData) {
+    const allRows = Object.values(data).reduce((acc: StatementRow[], { rows }) => {
+      acc.push(...rows)
+      return acc
+    }, [])
+    setStatementArtists(artistsFromSheetData(allRows))
   }
 
   if (!manager) return <Box>Loading...</Box>

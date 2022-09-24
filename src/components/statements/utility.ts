@@ -1,4 +1,4 @@
-import { StatementRow } from '../../Types'
+import { StatementRow } from '../../types/Types'
 
 export type FileData = {
   [fileName: string]: string
@@ -29,4 +29,16 @@ export async function loadFiles(files: File[]) {
 
 export function artistsFromSheetData(data: StatementRow[]) {
   return Array.from(new Set(data.map((d) => d.Artist)))
+}
+
+export function statementDatesFromRows(rows: StatementRow[]) {
+  const fromDates = new Set<string>()
+  const toDates = new Set<string>()
+  rows.forEach((row) => {
+    fromDates.add(row.PeriodFrom || row.Date)
+    toDates.add(row.PeriodTo || row.Date)
+  })
+  const fromDate = Array.from(fromDates).sort().shift()
+  const toDate = Array.from(toDates).sort().pop()
+  return { fromDate, toDate }
 }

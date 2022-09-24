@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx'
-import { statementColMap, StatementRow } from '../Types'
+import { ITransactionData, statementColMap, StatementRow } from '../types/Types'
 
 function toStatement(rowObj: {[key: string]: string}): StatementRow {
   const dataObj: {[key: string]: string} = {}
@@ -16,18 +16,20 @@ function toStatement(rowObj: {[key: string]: string}): StatementRow {
   return dataObj as unknown as StatementRow
 }
 
-export function loadStatementFile(data: string): StatementRow[] {
+export function loadStatementFile(data: string): { sheetHeaders: string[]; rows: StatementRow[] } {
   const testCols = Object.values(statementColMap).reduce((acc: string[], cols) => {
     acc.push(...cols)
     return acc
   }, [])
   const workbook = XLSX.read(data, {
-    type: 'binary'
+    type: 'binary',
+    raw: true
   });
   const sheetName = workbook.SheetNames[0]
   const workSheet = workbook.Sheets[sheetName]
   const sheetRange = XLSX.utils.decode_range(workSheet['!ref']!)
   const testJson = XLSX.utils.sheet_to_csv(workSheet, { RS: '\n'})
+  const sheetHeaders: string[] = []
   let startIndex = -1
   testJson.split('\n').forEach((row, index) => {
     if (startIndex >= 0) return
@@ -35,6 +37,7 @@ export function loadStatementFile(data: string): StatementRow[] {
     const cols = fullCols.filter((col) => testCols.includes(col.toLowerCase()))
     if (cols.length > fullCols.length / 2) {
       startIndex = index
+      sheetHeaders.push(...fullCols)
     }
   })
   if (startIndex < 0) {
@@ -42,31 +45,24 @@ export function loadStatementFile(data: string): StatementRow[] {
   }
 
   const asJson = XLSX.utils.sheet_to_json<{[key: string]: string}>(workSheet, { range: { s: { c:0, r:startIndex }, e: sheetRange.e}})
-  return asJson.map(toStatement)
+  const rows = asJson.map(toStatement)
+  return { sheetHeaders, rows }
 }
 
-export function getByIsrc(data: StatementRow[]) {
-  return getMultiByKeyProp('ISRC', data)
+export function getByIsrc(data: ITransactionData[]) {
+  return getMultiByKeyProp('isrc', data)
 }
 
-export function getByTerritory(data: StatementRow[]) {
-  return getMultiByKeyProp('Territory', data)
+export function getByRetailer(data: ITransactionData[]) {
+  return getMultiByKeyProp('platformName', data)
 }
 
-export function getByArtist(data: StatementRow[]) {
-  return getMultiByKeyProp('Artist', data)
+export function getByLocation(data: ITransactionData[]) {
+  return getMultiByKeyProp('territory', data)
 }
 
-export function getByRetailer(data: StatementRow[]) {
-  return getMultiByKeyProp('Distributor', data)
-}
-
-export function getByLocation(data: StatementRow[]) {
-  return getMultiByKeyProp('Territory', data)
-}
-
-export function getMultiByKeyProp(key: keyof StatementRow, data: StatementRow[]) {
-  const byKeyProp: {[key: string]: StatementRow[]} = {}
+export function getMultiByKeyProp(key: keyof ITransactionData, data: ITransactionData[]) {
+  const byKeyProp: {[key: string]: ITransactionData[]} = {}
   data.forEach((row) => {
     !byKeyProp[row[key]] && (byKeyProp[row[key]] = [])
     byKeyProp[row[key]].push(row)
@@ -74,11 +70,10 @@ export function getMultiByKeyProp(key: keyof StatementRow, data: StatementRow[])
   return byKeyProp
 }
 
-export function consolidateRvByDate(data: StatementRow[]) {
-  const byDate: { [key: string]: number } = {}
-  data?.forEach((d) => {
-    !byDate[d.PeriodTo] && (byDate[d.PeriodTo] = 0)
-    byDate[d.PeriodTo] += d.Revenue
-  })
-  return byDate
+export function arrayMatchSort<T>(toMatch: T[]) {
+  return (a: T[], b: T[]) => {
+    const aMatch = a.filter((item) => toMatch.includes(item)).length
+    const bMatch = b.filter((item) => toMatch.includes(item)).length
+    return bMatch - aMatch
+  }
 }

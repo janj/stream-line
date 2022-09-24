@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactApexChart from 'react-apexcharts'
-import { StatementRow } from '../Types'
-import { getByRetailer } from './Helpers'
+import { getByRetailer } from '../Helpers'
 import { ApexOptions } from 'apexcharts'
-import { Box } from '@material-ui/core'
-import Filters, { ALL, IFilters } from './Filters'
+import { Box } from '@mui/material'
+import Filters, { ALL, IFilters } from '../Filters'
+import { ITransactionData } from '../../types/Types'
 
-export default function Retailers({ sheet }: { sheet: StatementRow[] }) {
-  const [byRetailer, setByRetailer] = React.useState<{[retailer: string]: StatementRow[]}>({})
+export default function Retailers({ transactions }: { transactions: ITransactionData[] }) {
+  const [byRetailer, setByRetailer] = React.useState<{[retailer: string]: ITransactionData[]}>({})
   const [currentSeries, setSeries] = React.useState<{ data: number[] }[]>([])
   const [currentCategories, setCategories] = React.useState<string[]>([])
   const [currentArtist, setCurrentArtist] = React.useState('')
@@ -15,14 +15,14 @@ export default function Retailers({ sheet }: { sheet: StatementRow[] }) {
   const [selectedSeries, setSelectedSeries] = React.useState('')
 
   React.useEffect(() => {
-    const byRetailer = getByRetailer(sheet)
+    const byRetailer = getByRetailer(transactions)
     const categories: string[] = []
     Object.keys(byRetailer).forEach((retailer) => {
       categories.push(retailer)
     })
     setByRetailer(byRetailer)
     setCategories(categories)
-  }, [sheet])
+  }, [transactions])
 
   React.useEffect(() => {
     const revenue: number[] = []
@@ -31,9 +31,9 @@ export default function Retailers({ sheet }: { sheet: StatementRow[] }) {
       let revTotal = 0
       let streamTotal = 0
       byRetailer[retailer].forEach((track) => {
-        if (currentArtist === ALL || currentArtist === track.Artist) {
-          revTotal += track.Revenue
-          streamTotal += track.Quantity
+        if (currentArtist === ALL || currentArtist === track.artistName) {
+          revTotal += track.revenue
+          streamTotal += track.quantity
         }
       })
       revenue.push(revTotal)
@@ -73,7 +73,7 @@ export default function Retailers({ sheet }: { sheet: StatementRow[] }) {
     }
   }
   return <Box>
-    <Filters sheet={sheet} onFiltersChanged={onFilterChange} />
+    <Filters sheet={transactions} onFiltersChanged={onFilterChange} />
     <ReactApexChart options={options} series={currentSeries} type="bar" height={350} />
   </Box>
 }

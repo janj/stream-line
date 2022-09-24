@@ -1,15 +1,35 @@
 import React from 'react'
-import { StatementRow } from '../Types'
-import { StatementsSelector } from './FileSelector'
-import TrackDetails from './TrackDetails'
-import Retailers from './Retailers'
-import Locations from './Locations'
-import { Box } from '@material-ui/core'
+import { ITransactionData, StatementRow } from '../types/Types'
+import { StatementsData, StatementsSelector } from './FileSelector'
+import TrackDetails from './transactionViews/TrackDetails'
+import Retailers from './transactionViews/Retailers'
+import Locations from './transactionViews/Locations'
+import { Box } from '@mui/material'
 import { getMappings, IArtistMapping } from './artists/artistMapping'
-import { getArtists, mapArtists } from './artists/artist'
+import { getArtists } from './artists/artist'
+
+function toTransactionData(statementRow: StatementRow): ITransactionData {
+  return {
+    artistName: statementRow.Artist,
+    platformName: statementRow.Distributor,
+    trackTitle: statementRow.TrackTitle,
+    date: statementRow.Date,
+    revenue: +statementRow.Revenue,
+    isrc: statementRow.ISRC,
+    territory: statementRow.Territory,
+    quantity: +statementRow.Quantity
+  }
+}
+
+function mapArtists(rows: StatementRow[], mapping: {[name: string]: IArtistMapping}) {
+  return rows.map((row) => {
+    row.Artist = mapping[row.Artist]?.mappedTo.name || row.Artist
+    return row
+  }).map(toTransactionData)
+}
 
 export default function Home() {
-  const [sheet, setSheet] = React.useState<StatementRow[]>([])
+  const [sheet, setSheet] = React.useState<ITransactionData[]>([])
   const [mappings, setMappings] = React.useState<{[name: string]: IArtistMapping}>()
 
   React.useState(() => {
@@ -20,11 +40,15 @@ export default function Home() {
 
   if (!mappings) return <Box>Loading...</Box>
 
-  function onStatementsSelect(rows: StatementRow[]) {
+  function onStatementsSelect(data: StatementsData) {
+    const allRows = Object.values(data).reduce((acc: StatementRow[], { rows }) => {
+      acc.push(...rows)
+      return acc
+    }, [])
     if (!mappings) {
-      setSheet(rows)
+      setSheet(allRows.map(toTransactionData))
     } else {
-      setSheet(mapArtists(rows, mappings))
+      setSheet(mapArtists(allRows, mappings))
     }
   }
 
@@ -35,15 +59,15 @@ export default function Home() {
     {!!sheet.length && <Box style={{ padding: 25, border: 'solid 1px' }}>
       Tracks
       <div style={{ padding: 25 }}>
-        <TrackDetails sheet={sheet} />
+        <TrackDetails transactions={sheet} />
       </div>
       Retailers
       <div style={{ padding: 25 }}>
-        <Retailers sheet={sheet} />
+        <Retailers transactions={sheet} />
       </div>
       Locations
       <div style={{ padding: 25 }}>
-        <Locations sheet={sheet} />
+        <Locations transactions={sheet} />
       </div>
     </Box>
     }

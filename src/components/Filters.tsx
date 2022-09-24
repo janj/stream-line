@@ -1,6 +1,6 @@
 import React from 'react'
-import { StatementRow } from '../Types'
-import { Box, MenuItem, Select } from '@material-ui/core'
+import { Box, MenuItem, Select } from '@mui/material'
+import { ITransactionData } from '../types/Types'
 
 export const ALL = 'all'
 const SERIES_TYPES = ['streams', 'revenue']
@@ -10,7 +10,10 @@ export interface IFilters {
   streamOrRevenue: string
 }
 
-export default function Filters({ sheet, onFiltersChanged }: { sheet: StatementRow[], onFiltersChanged: (filters: IFilters) => void}) {
+export default function Filters({ sheet, onFiltersChanged }: {
+  sheet: ITransactionData[]
+  onFiltersChanged: (filters: IFilters) => void}
+) {
   const [currentArtist, setCurrentArtist] = React.useState('')
   const [currentSeries, setCurrentSeries] = React.useState('')
   const [allArtists, setAllArtists] = React.useState<string[]>([])
@@ -18,8 +21,8 @@ export default function Filters({ sheet, onFiltersChanged }: { sheet: StatementR
   React.useEffect(() => {
     const artists: string[] = []
     sheet.forEach((row) => {
-      if (row.Artist && !artists.includes(row.Artist)) {
-        artists.push(row.Artist)
+      if (row.artistName && !artists.includes(row.artistName)) {
+        artists.push(row.artistName)
       }
     })
     setAllArtists(artists)
