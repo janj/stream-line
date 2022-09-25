@@ -1,15 +1,12 @@
 import React from 'react'
-import {
-  Box,
-  TextField
-} from '@mui/material'
+import { Box } from '@mui/material'
 import { getTransactionsCount, Transaction } from './transactions'
 import { getTransactionManager, TransactionsManager } from './TransactionsManager'
-import { DatePicker } from '@mui/x-date-pickers'
 import { TransactionsTable } from '../transactionViews/Table'
 import TrackDetails from '../transactionViews/TrackDetails'
 import Locations from '../transactionViews/Locations'
 import Retailers from '../transactionViews/Retailers'
+import DateRange, { IDateRange } from '../utility/DateRange'
 
 
 export function TransactionsView() {
@@ -18,20 +15,18 @@ export function TransactionsView() {
   const [totalCount, setTotalCount] = React.useState(0)
   const [minDate, setMinDate] = React.useState<Date>()
   const [maxDate, setMaxDate] = React.useState<Date>()
-  const [startDate, setStartDate] = React.useState<Date | null>()
-  const [endDate, setEndDate] = React.useState<Date | null>()
   const [currentSet, setCurrenctSet] = React.useState<Transaction[]>([])
+  const [selectedDateRange, setSelectedDateRange] = React.useState<IDateRange>({})
 
   React.useEffect(() => {
     getTransactionManager().then((manager) => {
       setManager(manager)
       manager.getTransactions().then((sorted) => {
-        const firstDate = sorted.find(({ date }) => !!date)?.date
-        const lastDate = sorted.pop()?.date
-        setMinDate(firstDate)
-        setMaxDate(lastDate)
-        setStartDate(firstDate)
-        setEndDate(lastDate)
+        const startDate = sorted.find(({ date }) => !!date)?.date
+        const endDate = sorted.pop()?.date
+        setMinDate(startDate)
+        setMaxDate(endDate)
+        setSelectedDateRange({ startDate, endDate })
         setTransactions(sorted)
       })
     })
@@ -40,6 +35,7 @@ export function TransactionsView() {
 
   React.useEffect(() => {
     let startIndex = 0
+    const { startDate, endDate } = selectedDateRange
     if (startDate) {
       const first = transactions.find(({ date }) => {
         const asDate = new Date(date)
@@ -60,25 +56,11 @@ export function TransactionsView() {
       }
     }
     setCurrenctSet(transactions.slice(startIndex, endIndex))
-  }, [startDate, endDate, transactions, setCurrenctSet])
+  }, [selectedDateRange, transactions, setCurrenctSet])
 
   return <Box>
     <Box padding={'10px'}>Transactions {totalCount}</Box>
-    <DatePicker
-      value={startDate}
-      minDate={minDate}
-      maxDate={maxDate}
-      onChange={setStartDate}
-      renderInput={(params) => <TextField {...params} />}
-    />
-    To
-    <DatePicker
-      value={endDate}
-      minDate={minDate}
-      maxDate={maxDate}
-      onChange={setEndDate}
-      renderInput={(params) => <TextField {...params} />}
-    />
+    <DateRange dateRange={selectedDateRange} minDate={minDate} maxDate={maxDate} onRangeChange={setSelectedDateRange} />
     <Box style={{ padding: 25, border: 'solid 1px' }}>
       {[
         ['All Transactions', TransactionsTable],

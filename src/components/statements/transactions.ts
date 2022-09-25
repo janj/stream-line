@@ -20,31 +20,31 @@ export class Transaction  extends ParseObj {
     this.platform = platform
   }
 
-  get distributor() {
+  get distributor(): string {
     return this.parseObj.get('distributor')
   }
-  get upc() {
+  get upc(): string {
     return this.parseObj.get('upc')
   }
   get from() {
     return this.parseObj.get('from')
   }
-  get quantity() {
+  get quantity(): number {
     return this.parseObj.get('quantity')
   }
-  get trackTitle() {
+  get trackTitle(): string {
     return this.parseObj.get('trackTitle')
   }
-  get releaseTitle() {
+  get releaseTitle(): string {
     return this.parseObj.get('releaseTitle')
   }
-  get contentType() {
+  get contentType(): string {
     return this.parseObj.get('contentType')
   }
-  get territory() {
+  get territory(): string {
     return this.parseObj.get('territory')
   }
-  get isrc() {
+  get isrc(): string {
     return this.parseObj.get('isrc')
   }
   get to() {
@@ -53,13 +53,13 @@ export class Transaction  extends ParseObj {
   get date() {
     return this.parseObj.get('date')
   }
-  get revenue() {
+  get revenue(): number {
     return this.parseObj.get('revenue')
   }
-  get artistName() {
+  get artistName(): string {
     return this.artist?.name
   }
-  get platformName() {
+  get platformName(): string {
     return this.platform.name
   }
 }
