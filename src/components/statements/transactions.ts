@@ -62,6 +62,31 @@ export class Transaction  extends ParseObj {
   get platformName(): string {
     return this.platform.name
   }
+  get identifier(): string {
+    return [
+      this.upc,
+      this.isrc,
+      this.date,
+      this.distributor,
+      this.revenue,
+      this.territory,
+      this.contentType,
+      this.quantity
+  ].join(':')
+  }
+}
+
+export function statementIdentifier(row: StatementRow) {
+  return [
+    row.UPC,
+    row.ISRC,
+    row.Date || row.PeriodFrom,
+    row.Distributor,
+    +row.Revenue,
+    row.Territory,
+    row.ContentType,
+    +row.Quantity
+  ].join(':')
 }
 
 export function createTransaction({ platform, artist, row }: {
@@ -70,7 +95,7 @@ export function createTransaction({ platform, artist, row }: {
   row: StatementRow
 }) {
   const user = Parse.User.current()
-  if (!user) return Promise.resolve()
+  if (!user) return Promise.reject()
   const params = {
     user,
     artist,
@@ -91,45 +116,6 @@ export function createTransaction({ platform, artist, row }: {
   const transaction = new Parse.Object(transactionKey, params)
   return transaction.save().then((parseObj) => new Transaction({parseObj, artist, platform}))
 }
-
-type SortedTransactions = {
-  [platformId: string]: Transaction[]
-}
-
-function dateSort(t1: Transaction, t2: Transaction) {
-  const d1 = t1.date || t1.from
-  const d2 = t2.date || t2.from
-  return d1.localeCompare(d2)
-}
-
-export async function getSortedTransactions(artists: {[id: string]: Artist}, platforms: {[id: string]: Platform}) {
-  const user = Parse.User.current()
-  if (!user) return
-  const query = new Parse.Query(transactionKey).equalTo('user', user).limit(500)
-  const transactions = await query.find()
-  const sorted = transactions.reduce((acc: SortedTransactions, parseObj) => {
-    const artistId = parseObj.get('artist').parseObj.id
-    const platformId = parseObj.get('platform').parseObj.id
-    const params = {
-      parseObj,
-      artist: artists[artistId],
-      platform: platforms[platformId]
-    }
-    const transaction = new Transaction(params)
-    if (!acc[platformId]) acc[platformId] = []
-    acc[platformId].push(transaction)
-    return acc
-  }, {})
-  return Object.entries(sorted).reduce((acc: SortedTransactions, [pid, transactions]) => {
-    acc[pid] = transactions.sort(dateSort)
-    return acc
-  }, {})
-}
-
-// export async function getTransactionArtists() {
-//   const data = await Parse.Cloud.run("transactionData");
-//   console.log('transactionData', data)
-// }
 
 const transactionLimit = 10000
 

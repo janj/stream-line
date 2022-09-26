@@ -5,40 +5,51 @@ import { artistsFromSheetData, statementDatesFromRows } from './utility';
 import { ArtistsManager, getArtistsManager } from '../artists/ArtistsManager';
 import { ArtistsImport } from '../artists/ArtistsImport';
 import { ConfirmCommitButton } from '../utility/ConfirmCommitButton';
-import { getStatementsManager, StatementsManager } from './StatementsManager';
+import { getStatementsManager, StatementsManager } from './StatementsManager'
 import { Platform } from './statements';
+import { filterExisting, TransactionsManager } from './TransactionsManager'
+import { StatementRow } from '../../types/Types'
+import { Transaction } from './transactions'
+import AutoDisableButton from '../utility/AutoDisableButton'
 
 export function StatementsImport() {
   const [statementData, setStatementData] = React.useState<StatementsData>({})
   const [artistManager, setArtistManager] = React.useState<ArtistsManager>()
   const [statementsManager, setStatementsManager] = React.useState<StatementsManager>()
+  const [transactionsManager, setTransactionsManager] = React.useState<TransactionsManager>()
 
   React.useEffect(() => {
     getArtistsManager().then(setArtistManager)
     getStatementsManager().then(setStatementsManager)
   }, [])
+  React.useEffect(() => {
+    if (!statementsManager || !artistManager) return
+    const artists = Object.values(artistManager.artistsByName)
+    setTransactionsManager(new TransactionsManager(artists, statementsManager.platforms))
+  }, [statementsManager, artistManager])
 
-  if (!artistManager || !statementsManager) return <Box>Loading...</Box>
+  if (!artistManager || !statementsManager || !transactionsManager) return <Box>Loading...</Box>
 
   return <Box>
     <Box>Statements Import</Box>
     <Box><StatementsSelector label={'Import File Data'} onStatementsSelect={setStatementData} /></Box>
     <Box>{Object.entries(statementData).map(([name, data]) => {
-      return <StatementImport key={name} name={name} data={data} artistManager={artistManager} statementsManager={statementsManager} />
+      return <StatementImport key={name} name={name} data={data} artistManager={artistManager} statementsManager={statementsManager} transactionsManager={transactionsManager} />
     })}</Box>
   </Box>
 }
 
-function StatementImport({ name, data: { rows, sheetHeaders }, artistManager, statementsManager }: {
+function StatementImport({ name, data: { rows, sheetHeaders }, artistManager, statementsManager, transactionsManager }: {
   name: string
   data: IStatementData
   artistManager: ArtistsManager
   statementsManager: StatementsManager
+  transactionsManager: TransactionsManager
 }) {
   const [showDetails, setShowDetails] = React.useState(false)
   const [statementArtists, setStatementArtists] = React.useState<string[]>([])
   const [dates, setDates] = React.useState<{fromDate?: string; toDate?: string}>({})
-  const [identifiedPlatform, setIdentifiedPlatform] = React.useState<string>()
+  const [identifiedPlatform, setIdentifiedPlatform] = React.useState<Platform>()
 
   React.useEffect(() => {
     setStatementArtists(artistsFromSheetData(rows))
@@ -46,21 +57,18 @@ function StatementImport({ name, data: { rows, sheetHeaders }, artistManager, st
   }, [rows])
 
   React.useEffect(() => {
-    const platformId = statementsManager.platformIdForHeaders(sheetHeaders)
-    setIdentifiedPlatform(platformId)
+    setIdentifiedPlatform(statementsManager.platformForHeaders(sheetHeaders))
   }, [sheetHeaders, statementsManager])
 
-  function importStatement() {
-    const artistNames = rows.map(({ Artist }) => Artist)
-    const { artists } = artistManager.sortNames(artistNames)
-    statementsManager.importStatementData({rows, sheetHeaders}, artists)
+  function importRowsFunc(platform: Platform) {
+    return (rows: StatementRow[], completed: (done: number) => void) => transactionsManager.importStatementData(rows, platform, artistManager.artistsByName, completed)
   }
 
   return <Box padding={'10px'} border={'1px solix'}>
     <Box style={{backgroundColor: 'lightGrey'}} padding={'5px'}>
       <Button onClick={() => setShowDetails(!showDetails)}>{`File: ${name}`}</Button>
       <Box>
-        {identifiedPlatform && <b>{statementsManager.platformForId(identifiedPlatform)?.name}</b>}
+        {identifiedPlatform && <b>{identifiedPlatform.name}</b>}
         &nbsp;{rows.length} Rows
         &nbsp;{statementArtists.length} Artists
       </Box>
@@ -71,22 +79,67 @@ function StatementImport({ name, data: { rows, sheetHeaders }, artistManager, st
       <PlatformImport
         headers={sheetHeaders}
         statementsManager={statementsManager}
-        identifiedPlatform={identifiedPlatform || ''}
+        identifiedPlatform={identifiedPlatform}
       />
     </Box>}
-    {identifiedPlatform && <ConfirmCommitButton onClick={importStatement}>Import</ConfirmCommitButton>}
+    {identifiedPlatform && <ManagedImport
+      transactionsManager={transactionsManager}
+      platform={identifiedPlatform}
+      rows={rows}
+      statementsImport={importRowsFunc(identifiedPlatform)}
+    />}
+  </Box>
+}
+
+function ManagedImport({ transactionsManager, platform, rows, statementsImport }: {
+  transactionsManager: TransactionsManager
+  platform: Platform
+  rows: StatementRow[]
+  statementsImport: (rows: StatementRow[], progress: (done: number) => void) => Promise<unknown>
+}) {
+  const [toImport, setToImport] = React.useState<StatementRow[]>([])
+  const [toExclude, setToExclude] = React.useState<StatementRow[]>([])
+  const [dupTransactions, setDupTransactions] = React.useState<Transaction[]>([])
+  const [completed, setCompleted] = React.useState(0)
+
+  function importStatement() {
+    return statementsImport(rows, setCompleted).then(() => {
+      transactionsManager.getTransactions().then((trx) => {
+        const { toImport, toExclude, dupTransactions } = filterExisting(platform, trx, rows)
+        setToImport(toImport)
+        setToExclude(toExclude)
+        setDupTransactions(dupTransactions)
+      })
+    })
+  }
+
+  React.useEffect(() => {
+    transactionsManager.getTransactions().then((trx) => {
+      const { toImport, toExclude, dupTransactions } = filterExisting(platform, trx, rows)
+      setToImport(toImport)
+      setToExclude(toExclude)
+      setDupTransactions(dupTransactions)
+    })
+  }, [transactionsManager, platform, rows])
+
+  return <Box>
+    <Box>{`Importing ${toImport.length}`}</Box>
+    <Box>{`Excluding ${toExclude.length}`}</Box>
+    {!!dupTransactions.length && <Box>{`${dupTransactions.length} Existing Dups`}</Box>}
+    <AutoDisableButton stayDisabled onClick={importStatement}>Import</AutoDisableButton>
+    {!!completed && `${completed} Imported`}
   </Box>
 }
 
 function PlatformImport({ headers, statementsManager, identifiedPlatform }: {
   headers: string[]
   statementsManager: StatementsManager
-  identifiedPlatform: string
+  identifiedPlatform?: Platform
 }) {
   const [missingHeaders, setMissingHeaders] = React.useState<string[]>([])
   const [newPlatform, setNewPlatform] = React.useState('')
   const [showImport, setShowImport] = React.useState(false)
-  const [selectedPlatform, setSelectedPlatform] = React.useState(identifiedPlatform)
+  const [selectedPlatform, setSelectedPlatform] = React.useState(identifiedPlatform?.id || '')
   const [existingPlatforms, setExistingPlatforms] = React.useState<{[id: string]: Platform}>({})
 
   React.useEffect(() => {
@@ -120,7 +173,7 @@ function PlatformImport({ headers, statementsManager, identifiedPlatform }: {
       <Button disabled={!!identifiedPlatform} onClick={() => setShowImport(!identifiedPlatform && !showImport)}>
         Platform
       </Button>
-      {!!identifiedPlatform && existingPlatforms[identifiedPlatform]?.name}
+      {identifiedPlatform?.name}
     </Box>
     {showImport && <Box>
       <TextField value={newPlatform} onChange={({ target }) => setNewPlatform(target.value)}/>

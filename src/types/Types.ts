@@ -33,13 +33,13 @@ export const statementColMap: {[key: string]: string[]} = {
   Territory: [HL.territory, HL.countryIso],
   TrackTitle: [HL.trackTitle, HL.trackName, HL.track],
 
-  Date: [HL.date, HL.transactionDate],
+  Date: [HL.date, HL.royaltyDate],
   UPC: [HL.upc, HL.eanUpc],
   CountryName: [HL.countryName],
   TotalDownloads: [HL.totalDownloads],
   AmountCurrency: [HL.amountCurrency, HL.total],
 
-  Ignore: [HL.catNo, HL.suitebeatsComp, HL.royaltyDate, HL.split, HL.type, HL.source]
+  Ignore: [HL.catNo, HL.suitebeatsComp, HL.transactionDate, HL.split, HL.type, HL.source]
 }
 
 export interface ITransactionData {

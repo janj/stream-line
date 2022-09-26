@@ -1,11 +1,12 @@
-import * as React from 'react'
+import React from 'react'
 import { Box, Button } from '@material-ui/core'
+import { ButtonProps } from '@material-ui/core/Button/Button'
 
 export function ConfirmCommitButton({
                                       onClick,
                                       children,
                                       ...props
-                                    }: any) {
+                                    }: ButtonProps) {
   const [confirming, setConfirming] = React.useState(false)
 
   const onConfirm = (e: any) => {
