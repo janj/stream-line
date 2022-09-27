@@ -53,6 +53,7 @@ export default function Home() {
   }
 
   return <Box style={{ padding: 25 }}>
+    <Box>Upload statement files to see graphs, log in to store statements.</Box>
     <Box style={{ padding: 25 }}>
       <StatementsSelector onStatementsSelect={onStatementsSelect} />
     </Box>

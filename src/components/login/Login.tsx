@@ -1,34 +1,28 @@
 import React from 'react';
 import { Box, Button, TextField } from '@mui/material'
-import { doUserLogin, doUserLogout, doUserRegistration, getCurrentUser, User } from './utility'
+import { UserContext } from '../../App'
 
 export default function Login() {
   const [username, setUsername] = React.useState('')
   const [password, setPassword] = React.useState('')
-  const [currentUser, setCurrentUser] = React.useState<User | undefined>()
 
-  React.useEffect(() => {
-    setCurrentUser(getCurrentUser())
-  }, [])
+  const { currentUser, userLogin, userLogout, userRegister } = React.useContext(UserContext)
 
   React.useEffect(() => {
     setUsername('')
     setPassword('')
   }, [currentUser])
 
-  async function doLogout() {
-    await doUserLogout()
-    setCurrentUser(undefined)
+  function doLogout() {
+    userLogout()
   }
 
-  async function doRegister() {
-    const user = await doUserRegistration({ username, password })
-    setCurrentUser(user)
+  function doRegister() {
+    userRegister(username, password)
   }
 
-  async function doLogin() {
-    const user = await doUserLogin({ username, password })
-    setCurrentUser(user)
+  function doLogin() {
+    userLogin(username, password)
   }
 
   if (currentUser) {
@@ -46,7 +40,11 @@ export default function Login() {
     </Box>
     <Box display={'flex'} justifyContent={'center'}>
       <Box paddingRight={'10px'}>Password</Box>
-      <TextField value={password} onChange={(e) => setPassword(e.target.value)} />
+      <TextField
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
     </Box>
     <Box>
       <Button onClick={doRegister}>Signup</Button>

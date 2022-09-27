@@ -10,6 +10,8 @@ import { StatementsImport } from './components/statements/StatementsImport';
 import { TransactionsView } from './components/statements/TransactionsView';
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import StreamLineAppBar from './components/appBar/AppBar'
+import { doUserLogin, doUserLogout, doUserRegistration } from './components/login/utility'
 
 function useQuery() {
   const { search } = useLocation();
@@ -25,25 +27,46 @@ const componentMap = {
 
 const userRequired = ['artists', 'statements', 'transactions']
 
+export const UserContext = React.createContext<{
+  currentUser: Parse.User | undefined
+  userLogin: (u: string, pw: string) => void
+  userRegister: (u: string, pw: string) => void
+  userLogout: () => void
+}>({
+  currentUser: undefined,
+  userLogin: () => {},
+  userRegister: () => {},
+  userLogout: () => {}
+})
+
 function useComponent() {
   const queryParams = useQuery()
   const currentUser = Parse.User.current()
 
   for (const [key, component] of Object.entries(componentMap)) {
     if (queryParams.has(key) && (currentUser || !userRequired.includes(key))) {
-      return component 
+      return component
     }
   }
   return Home
 }
 
 function App() {
+  const [currentUser, setCurrentUser] = React.useState<Parse.User>()
   const Component = useComponent()
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
+      <UserContext.Provider value={{
+        currentUser,
+        userLogin: (username, password) => doUserLogin({ username, password}).then(setCurrentUser),
+        userRegister: (username, password) => doUserRegistration({ username, password }).then(setCurrentUser),
+        userLogout: () => doUserLogout().then(setCurrentUser)
+      }}>
+      <StreamLineAppBar />
       <Box className="App" padding={'35px'}>
         <Component />
       </Box>
+      </UserContext.Provider>
     </LocalizationProvider>
   )
 }
