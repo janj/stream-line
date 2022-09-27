@@ -18,14 +18,21 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-const componentMap = {
-  login: Login,
-  artists: Management,
-  statements: StatementsImport,
-  transactions: TransactionsView
+export enum RouteParams {
+  Login = 'login',
+  Artists = 'artists',
+  Statements = 'statements',
+  Transactions = 'transactions'
 }
 
-const userRequired = ['artists', 'statements', 'transactions']
+const componentMap = {
+  [RouteParams.Login]: Login,
+  [RouteParams.Artists]: Management,
+  [RouteParams.Statements]: StatementsImport,
+  [RouteParams.Transactions]: TransactionsView
+}
+
+const userRequired: string[] = [RouteParams.Artists, RouteParams.Statements, RouteParams.Transactions]
 
 export const UserContext = React.createContext<{
   currentUser: Parse.User | undefined
