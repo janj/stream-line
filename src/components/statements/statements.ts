@@ -1,5 +1,4 @@
-import Parse from 'parse'
-import { ParseObj } from "../parseObj"
+import { createNewObject, createQuery, ParseObj } from '../../types/parseObj'
 
 const statementHeadersKey = 'StatementHeaders'
 const platformKey = 'Platform'
@@ -27,22 +26,22 @@ export class PlatformHeader extends ParseObj {
 }
 
 export async function createHeader(label: string) {
-  const header = new Parse.Object(statementHeadersKey, { label })
+  const header = createNewObject(statementHeadersKey, { label })
   return header.save().then((obj) => new StatementHeader(obj))
 }
 
 export async function getStatementHeaders() {
-  const query = new Parse.Query(statementHeadersKey)
+  const query = createQuery(statementHeadersKey)
   return query.find().then((parseObjs) => parseObjs.map((obj) => new StatementHeader(obj)))
 }
 
 export async function createPlatform(params: { name: string }) {
-  const platform = new Parse.Object(platformKey, params)
+  const platform = createNewObject(platformKey, params)
   return platform.save().then((obj) => new Platform(obj))
 }
 
 export async function getPlatforms() {
-  const query = new Parse.Query(platformKey)
+  const query = createQuery(platformKey)
   return query.find().then((parseObjs) => parseObjs.map((obj) => new Platform(obj)))
 }
 
@@ -55,11 +54,11 @@ export async function getPlatformsById() {
 }
 
 export async function createPlatformHeader(platform: Platform, header: StatementHeader) {
-  const platformHeader = new Parse.Object(platformHeadersKey, { platform, header })
+  const platformHeader = createNewObject(platformHeadersKey, { platform, header })
   return platformHeader.save().then((obj) => new PlatformHeader(obj))
 }
 
 export async function getPlatformHeaders() {
-  const query = new Parse.Query(platformHeadersKey)
+  const query = createQuery(platformHeadersKey)
   return query.find().then((parseObjs) => parseObjs.map((obj) => new PlatformHeader(obj)))
 }

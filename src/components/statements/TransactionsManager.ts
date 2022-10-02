@@ -1,4 +1,4 @@
-import { Artist, getArtists } from '../artists/artist'
+import { Artist, getArtists, IArtist } from '../artists/artist'
 import { getPlatforms, Platform } from './statements'
 import {
   createTransaction,
@@ -8,23 +8,26 @@ import {
 } from './transactions'
 import { StatementRow } from '../../types/Types'
 import { IArtistsByName } from '../artists/ArtistsManager'
+import { User } from '../login/utility'
 
-export async function getTransactionManager() {
-  const [artits, platforms] = await Promise.all([
+export async function getTransactionManager(user: User) {
+  const [artists, platforms] = await Promise.all([
     getArtists(),
     getPlatforms()
   ])
-  return new TransactionsManager(artits, platforms)
+  return new TransactionsManager(user, artists, platforms)
 }
 
 export class TransactionsManager {
-  allArtists: {[id: string]: Artist}
+  user: User
+  allArtists: {[id: string]: IArtist}
   allPlatforms: {[id: string]: Platform}
   transactionsPromise: Promise<Transaction[]> | undefined
   addedTransactions: Transaction[]
 
-  constructor(allArtists: Artist[], allPlatforms: Platform[]) {
-    this.allArtists = allArtists.reduce((acc: {[id: string]: Artist}, a) => {
+  constructor(user: User, allArtists: IArtist[], allPlatforms: Platform[]) {
+    this.user = user
+    this.allArtists = allArtists.reduce((acc: {[id: string]: IArtist}, a) => {
       acc[a.id] = a
       return acc
     }, {})
@@ -37,7 +40,7 @@ export class TransactionsManager {
 
   getTransactions() {
     if (this.transactionsPromise) return this.transactionsPromise
-    this.transactionsPromise = getAllTransactions(this.allArtists, this.allPlatforms)
+    this.transactionsPromise = getAllTransactions(this.user, this.allArtists, this.allPlatforms)
       .then((trx) => [...trx, ...this.addedTransactions])
     return this.transactionsPromise
   }
@@ -45,6 +48,7 @@ export class TransactionsManager {
   importStatementData(rows: StatementRow[], platform: Platform, artists: IArtistsByName, completed: (done: number) => void) {
     const params = rows.map((row) => {
       return {
+        user: this.user,
         platform,
         artist: artists[row.Artist],
         row

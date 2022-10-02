@@ -1,5 +1,4 @@
-import Parse from 'parse'
-import { ParseObj } from '../parseObj'
+import { BaseObject, createNewObject, createQuery, ParseObj } from '../../types/parseObj'
 import { IArtist } from './artist'
 
 const className = 'ArtistMapping'
@@ -12,7 +11,7 @@ export interface IArtistMapping {
 class ArtistMapping extends ParseObj {
   artist: IArtist
 
-  constructor(parseObj: Parse.Object, artist: IArtist) {
+  constructor(parseObj: BaseObject, artist: IArtist) {
     super(parseObj)
     this.artist = artist
   }
@@ -30,7 +29,7 @@ export async function getMappings(allArtists: IArtist[]) {
     acc[artist.id] = artist
     return acc
   }, {})
-  const query = new Parse.Query(className)
+  const query = createQuery(className)
   return query.find()
     .then((parseObjs) => {
       return parseObjs.reduce((acc: {[n: string]: IArtistMapping}, parseObj) => {
@@ -45,6 +44,6 @@ export async function createMapping({ name, mappedTo }: {
   name: string
   mappedTo: IArtist
 }): Promise<IArtistMapping> {
-  const mapping = new Parse.Object(className, { name, mappedTo: mappedTo.parseObj })
+  const mapping = createNewObject(className, { name, mappedTo: mappedTo.parseObj })
   return mapping.save().then((parseObj) => new ArtistMapping(parseObj, mappedTo))
 }

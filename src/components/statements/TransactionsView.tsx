@@ -7,6 +7,7 @@ import TrackDetails from '../transactionViews/TrackDetails'
 import Locations from '../transactionViews/Locations'
 import Retailers from '../transactionViews/Retailers'
 import DateRange, { IDateRange } from '../utility/DateRange'
+import { UserContext } from '../contexts'
 
 
 export function TransactionsView() {
@@ -18,8 +19,11 @@ export function TransactionsView() {
   const [currentSet, setCurrenctSet] = React.useState<Transaction[]>([])
   const [selectedDateRange, setSelectedDateRange] = React.useState<IDateRange>({})
 
+  const { currentUser } = React.useContext(UserContext)
+
   React.useEffect(() => {
-    getTransactionManager().then((manager) => {
+    if (!currentUser) return
+    getTransactionManager(currentUser).then((manager) => {
       setManager(manager)
       manager.getTransactions().then((sorted) => {
         const startDate = sorted.find(({ date }) => !!date)?.date
@@ -31,7 +35,7 @@ export function TransactionsView() {
       })
     })
     getTransactionsCount().then(setTotalCount)
-  }, [])
+  }, [currentUser])
 
   React.useEffect(() => {
     let startIndex = 0

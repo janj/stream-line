@@ -44,7 +44,7 @@ export const statementColMap: {[key: string]: string[]} = {
 
 export interface ITransactionData {
   date: string
-  artistName: string
+  artistName?: string
   platformName: string
   quantity: number
   trackTitle: string

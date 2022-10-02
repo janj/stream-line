@@ -1,5 +1,4 @@
-import Parse from 'parse'
-import { IParseObj, ParseObj } from '../parseObj'
+import { createNewObject, createQuery, IParseObj, ParseObj } from '../../types/parseObj'
 
 const className = 'Artist'
 
@@ -15,7 +14,7 @@ export class Artist extends ParseObj {
 }
 
 export async function getArtists() {
-  const query = new Parse.Query(className)
+  const query = createQuery(className)
   return query.find().then((parseObjs) => parseObjs.map((obj) => new Artist(obj)))
 }
 
@@ -28,6 +27,6 @@ export async function getArtistsById() {
 }
 
 export async function createArtist({ name }: { name: string }) {
-  const artist = new Parse.Object(className, { name })
+  const artist = createNewObject(className, { name })
   return artist.save().then((parseObj) => new Artist(parseObj))
 }

@@ -1,18 +1,23 @@
-import Parse from 'parse'
 import { StatementRow } from "../../types/Types"
-import { Artist, IArtist } from "../artists/artist"
-import { ParseObj } from "../parseObj"
+import { IArtist } from "../artists/artist"
+import {
+  ParseObj,
+  BaseObject,
+  createNewObject,
+  createQuery
+} from '../../types/parseObj'
 import { Platform } from "./statements"
+import { User } from '../login/utility'
 
 const transactionKey = 'Transaction'
 
 export class Transaction  extends ParseObj {
-  artist: Artist | undefined
+  artist: IArtist | undefined
   platform: Platform
 
   constructor({parseObj, artist, platform}: {
-    parseObj: Parse.Object
-    artist?: Artist
+    parseObj: BaseObject
+    artist?: IArtist
     platform: Platform
   }) {
     super(parseObj)
@@ -21,42 +26,42 @@ export class Transaction  extends ParseObj {
   }
 
   get distributor(): string {
-    return this.parseObj.get('distributor')
+    return this.getProperty('distributor')
   }
   get upc(): string {
-    return this.parseObj.get('upc')
+    return this.getProperty('upc')
   }
   get from() {
-    return this.parseObj.get('from')
+    return this.getProperty('from')
   }
   get quantity(): number {
-    return this.parseObj.get('quantity')
+    return this.getProperty('quantity')
   }
   get trackTitle(): string {
-    return this.parseObj.get('trackTitle')
+    return this.getProperty('trackTitle')
   }
   get releaseTitle(): string {
-    return this.parseObj.get('releaseTitle')
+    return this.getProperty('releaseTitle')
   }
   get contentType(): string {
-    return this.parseObj.get('contentType')
+    return this.getProperty('contentType')
   }
   get territory(): string {
-    return this.parseObj.get('territory')
+    return this.getProperty('territory')
   }
   get isrc(): string {
-    return this.parseObj.get('isrc')
+    return this.getProperty('isrc')
   }
   get to() {
-    return this.parseObj.get('to')
+    return this.getProperty('to')
   }
   get date() {
-    return this.parseObj.get('date')
+    return this.getProperty('date')
   }
   get revenue(): number {
-    return this.parseObj.get('revenue')
+    return this.getProperty('revenue')
   }
-  get artistName(): string {
+  get artistName(): string | undefined {
     return this.artist?.name
   }
   get platformName(): string {
@@ -89,13 +94,12 @@ export function statementIdentifier(row: StatementRow) {
   ].join(':')
 }
 
-export function createTransaction({ platform, artist, row }: {
+export function createTransaction({ user, platform, artist, row }: {
+  user: User
   platform: Platform
   artist: IArtist
   row: StatementRow
 }) {
-  const user = Parse.User.current()
-  if (!user) return Promise.reject()
   const params = {
     user,
     artist,
@@ -113,19 +117,19 @@ export function createTransaction({ platform, artist, row }: {
     upc: row.UPC.toString(),
     date: row.Date || row.PeriodFrom
   }
-  const transaction = new Parse.Object(transactionKey, params)
+  const transaction = createNewObject(transactionKey, params)
   return transaction.save().then((parseObj) => new Transaction({parseObj, artist, platform}))
 }
 
 const transactionLimit = 10000
 
 export async function getAllTransactions(
-  artists: {[id: string]: Artist},
+  user: User,
+  artists: {[id: string]: IArtist},
   platforms: {[id: string]: Platform},
   skip: number = 0
 ): Promise<Transaction[]> {
-  const user = Parse.User.current
-  const query = new Parse.Query(transactionKey)
+  const query = createQuery(transactionKey)
     .equalTo('user', user)
     .ascending('date').limit(transactionLimit)
     .skip(skip)
@@ -133,7 +137,7 @@ export async function getAllTransactions(
     const transactions = parseObjs.map((parseObj, i, orig) => {
       if (i === 0) console.log(orig.length)
       const artistObj = parseObj.get('artist')
-      let artist: Artist | undefined
+      let artist: IArtist | undefined
       if (artistObj) artist = artists[artistObj.parseObj.id]
       const platform = platforms[parseObj.get('platform').parseObj.id]
       return new Transaction({ parseObj, artist, platform })
@@ -141,7 +145,7 @@ export async function getAllTransactions(
     if (transactions.length < skip + transactionLimit) {
       return transactions
     }
-    return getAllTransactions(artists, platforms, transactions.length).then((rest) => {
+    return getAllTransactions(user, artists, platforms, transactions.length).then((rest) => {
       transactions.push(...rest)
       return transactions
     })

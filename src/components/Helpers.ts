@@ -64,8 +64,10 @@ export function getByLocation(data: ITransactionData[]) {
 export function getMultiByKeyProp(key: keyof ITransactionData, data: ITransactionData[]) {
   const byKeyProp: {[key: string]: ITransactionData[]} = {}
   data.forEach((row) => {
-    !byKeyProp[row[key]] && (byKeyProp[row[key]] = [])
-    byKeyProp[row[key]].push(row)
+    const rowValue = row[key]
+    if (!rowValue) return
+    !byKeyProp[rowValue] && (byKeyProp[rowValue] = [])
+    byKeyProp[rowValue].push(row)
   })
   return byKeyProp
 }
