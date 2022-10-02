@@ -17,6 +17,12 @@ export class ParseObj {
   getProperty(propKey: string) {
     return this.parseObj.get(propKey)
   }
+
+  setProperty(propKey: string, value: any) {
+    const result = this.parseObj.set(propKey, value)
+    if (result) this.parseObj = result
+    return result
+  }
 }
 
 export function getCurrentUser(): User | undefined {
