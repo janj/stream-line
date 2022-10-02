@@ -11,6 +11,7 @@ import { filterExisting, TransactionsManager } from './TransactionsManager'
 import { StatementRow } from '../../types/Types'
 import { Transaction } from './transactions'
 import AutoDisableButton from '../utility/AutoDisableButton'
+import { UserContext } from '../contexts'
 
 export function StatementsImport() {
   const [statementData, setStatementData] = React.useState<StatementsData>({})
@@ -18,15 +19,18 @@ export function StatementsImport() {
   const [statementsManager, setStatementsManager] = React.useState<StatementsManager>()
   const [transactionsManager, setTransactionsManager] = React.useState<TransactionsManager>()
 
+  const { currentUser } = React.useContext(UserContext)
+
   React.useEffect(() => {
     getArtistsManager().then(setArtistManager)
     getStatementsManager().then(setStatementsManager)
   }, [])
+
   React.useEffect(() => {
-    if (!statementsManager || !artistManager) return
+    if (!statementsManager || !artistManager || !currentUser) return
     const artists = Object.values(artistManager.artistsByName)
-    setTransactionsManager(new TransactionsManager(artists, statementsManager.platforms))
-  }, [statementsManager, artistManager])
+    setTransactionsManager(new TransactionsManager(currentUser, artists, statementsManager.platforms))
+  }, [statementsManager, artistManager, currentUser])
 
   if (!artistManager || !statementsManager || !transactionsManager) return <Box>Loading...</Box>
 
