@@ -4,6 +4,7 @@ import { User } from '../../parse/types'
 const labelKey = 'Label'
 
 export interface ILabel {
+  id: string
   name: string
 }
 
@@ -35,14 +36,21 @@ export async function getLabelManager(user: User) {
 
 export class LabelManager {
   user: User
-  allLabels: ILabel[]
+  allLabels: {[id: string]: ILabel}
   constructor(user: User, allLabels: ILabel[]) {
     this.user = user
-    this.allLabels = allLabels
+    this.allLabels = allLabels.reduce((acc: {[k: string]: ILabel}, label) => {
+      acc[label.id] = label
+      return acc
+    }, {})
   }
 
   async createLabel(name: string) {
     const newLabel = await createLabel(this.user, { name })
-    this.allLabels = [...this.allLabels, newLabel]
+    this.allLabels[newLabel.id] = newLabel
+  }
+
+  forId(id: string) {
+    if (id in this.allLabels) return this.allLabels[id]
   }
 }

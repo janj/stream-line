@@ -1,5 +1,5 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import './App.css';
 import Home from './components/Home'
 import { Box } from '@mui/material'
@@ -19,11 +19,7 @@ import {
 import LabelsView from './components/label/LabelsView'
 import { getLabelManager, LabelManager } from './components/label/label'
 import { RouteParams, UserContext, UserDataContext } from './components/contexts'
-
-function useQuery() {
-  const { search } = useLocation();
-  return React.useMemo(() => new URLSearchParams(search), [search]);
-}
+import { User } from './parse/types'
 
 const componentMap = {
   [RouteParams.Login]: Login,
@@ -36,11 +32,11 @@ const componentMap = {
 const userRequired: string[] = [RouteParams.Artists, RouteParams.Statements, RouteParams.Transactions]
 
 function useComponent() {
-  const queryParams = useQuery()
   const currentUser = getCurrentUser()
+  const [searchParams] = useSearchParams()
 
   for (const [key, component] of Object.entries(componentMap)) {
-    if (queryParams.has(key) && (currentUser || !userRequired.includes(key))) {
+    if (searchParams.has(key) && (currentUser || !userRequired.includes(key))) {
       return component
     }
   }
@@ -48,11 +44,11 @@ function useComponent() {
 }
 
 function ProvidersWrapper({children}: {children: any}) {
-  const [currentUser, setCurrentUser] = React.useState<Parse.User>()
+  const [currentUser, setCurrentUser] = React.useState<User>()
   const [labelManager, setLabelManager] = React.useState<LabelManager>()
 
   React.useEffect(() => {
-    setCurrentUser(Parse.User.current())
+    setCurrentUser(getCurrentUser())
   }, [])
 
   React.useEffect(() => {

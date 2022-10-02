@@ -47,7 +47,7 @@ function StreamLineDrawer({ show, onClose }: { show: boolean; onClose: () => voi
         ['Import Transactions', RouteParams.Statements],
         ['Artists', RouteParams.Artists]
       ].map(([label, searchParam]) => {
-        return <Box padding={'5px'}>
+        return <Box key={label} padding={'5px'}>
           <Button size={'large'} onClick={() => go(searchParam)}>{label}</Button>
         </Box>
       })}

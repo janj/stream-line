@@ -27,7 +27,3 @@ export enum RouteParams {
   Statements = 'statements',
   Transactions = 'transactions'
 }
-
-export interface IRouterContext {
-  goToPage: (page: RouteParams) => void
-}
