@@ -3,7 +3,7 @@ import { Box, Button, TextField } from '@mui/material'
 import { RouteParams, UserDataContext } from '../contexts'
 import { ILabel } from './label'
 import { useSearchParams } from 'react-router-dom'
-import ReleasesView from './ReleasesView'
+import ReleasesView from '../release/ReleasesView'
 
 export default function LabelsView() {
   const [labels, setLabels] = React.useState<ILabel[]>([])
