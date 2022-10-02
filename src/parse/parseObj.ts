@@ -23,7 +23,7 @@ export function getCurrentUser(): User | undefined {
   return Parse.User.current()
 }
 
-export function createNewObject(objectType: string, params: { [key: string]: unknown }): BaseObject {
+export function createNewObject(objectType: string, params?: { [key: string]: unknown }): BaseObject {
   return new Parse.Object(objectType, params)
 }
 

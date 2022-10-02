@@ -1,21 +1,20 @@
-import { ParseObj, createNewObject, createQuery } from '../../parse/parseObj'
+import { ParseObj, createNewObject, createQuery, IParseObj } from '../../parse/parseObj'
 import { User } from '../../parse/types'
 
 const labelKey = 'Label'
 
-export interface ILabel {
+export interface ILabel extends IParseObj{
   id: string
   name: string
 }
 
-export class Label extends ParseObj {
+class Label extends ParseObj {
   get name(): string {
-    return this.parseObj.get('name')
+    return this.getProperty('name')
   }
 }
 
 export async function createLabel(user: User, { name }: { name: string }) {
-  if (!user) return Promise.reject()
   const params = { user, name }
   const label = createNewObject(labelKey, params)
   const newObj = await label.save()

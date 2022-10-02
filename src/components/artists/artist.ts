@@ -7,7 +7,7 @@ export interface IArtist extends IParseObj{
   name: string
 }
 
-export class Artist extends ParseObj {
+class Artist extends ParseObj {
   get name() {
     return this.parseObj.get('name')
   }

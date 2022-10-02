@@ -3,6 +3,7 @@ import { Box, Button, TextField } from '@mui/material'
 import { RouteParams, UserDataContext } from '../contexts'
 import { ILabel } from './label'
 import { useSearchParams } from 'react-router-dom'
+import ReleasesView from './ReleasesView'
 
 export default function LabelsView() {
   const [labels, setLabels] = React.useState<ILabel[]>([])
@@ -67,5 +68,8 @@ function LabelView({ labelId }: { labelId: string }) {
 
   if (!label) return <Box>That's odd</Box>
 
-  return <Box>This one: {label.name}</Box>
+  return <Box>
+    <Box>Label: <b>{label.name}</b></Box>
+    <ReleasesView label={label} />
+  </Box>
 }

@@ -1,4 +1,4 @@
-import { Artist, getArtists, IArtist } from '../artists/artist'
+import { getArtists, IArtist } from '../artists/artist'
 import { getPlatforms, Platform } from './statements'
 import {
   createTransaction,
@@ -31,7 +31,7 @@ export class TransactionsManager {
       acc[a.id] = a
       return acc
     }, {})
-    this.allPlatforms = allPlatforms.reduce((acc: {[id: string]: Artist}, p) => {
+    this.allPlatforms = allPlatforms.reduce((acc: {[id: string]: Platform}, p) => {
       acc[p.id] = p
       return acc
     }, {})
