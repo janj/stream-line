@@ -1,4 +1,5 @@
 import { StatementRow } from '../../types/Types'
+import moment from 'moment'
 
 export type FileData = {
   [fileName: string]: string
@@ -32,13 +33,13 @@ export function artistsFromSheetData(data: StatementRow[]) {
 }
 
 export function statementDatesFromRows(rows: StatementRow[]) {
-  const fromDates = new Set<string>()
-  const toDates = new Set<string>()
-  rows.forEach((row) => {
-    fromDates.add(row.PeriodFrom || row.Date)
-    toDates.add(row.PeriodTo || row.Date)
-  })
-  const fromDate = Array.from(fromDates).sort().shift()
-  const toDate = Array.from(toDates).sort().pop()
+  const dates = rows.reduce((acc: string[], { Date, PeriodFrom, PeriodTo }) => {
+    [Date, PeriodTo, PeriodFrom].forEach((date) => {
+      date && acc.push(moment(date).format('YYYY-MM-DD'))
+    })
+    return acc
+  }, []).sort()
+  const fromDate = dates.shift()
+  const toDate = dates.pop()
   return { fromDate, toDate }
 }

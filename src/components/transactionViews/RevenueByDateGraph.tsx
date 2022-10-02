@@ -19,15 +19,15 @@ export default function RevenueByDateGraph({ datas }: { datas: {[key: string]: S
       [name: string]: { [key: string]: number }
     } = {}
 
-    Object.keys(datas).sort().forEach((label, i) => {
-      const color = i % 2 ? '#8884d8' : '#82ca9d"'
-      setLines((prev) => ({ ...prev, [label]: color}))
-      datas[label].forEach((data) => {
-        !byDate[data.PeriodTo] && (byDate[data.PeriodTo] = {})
-        !byDate[data.PeriodTo][label] && (byDate[data.PeriodTo][label] = 0)
-        byDate[data.PeriodTo][label] += data.Revenue
-      })
-    })
+    // Object.keys(datas).sort().forEach((label, i) => {
+    //   const color = i % 2 ? '#8884d8' : '#82ca9d"'
+    //   setLines((prev) => ({ ...prev, [label]: color}))
+    //   datas[label].forEach((data) => {
+    //     !byDate[data.PeriodTo] && (byDate[data.PeriodTo] = {})
+    //     !byDate[data.PeriodTo][label] && (byDate[data.PeriodTo][label] = 0)
+    //     byDate[data.PeriodTo][label] += data.Revenue
+    //   })
+    // })
 
     const forChart: { [kdy: string]: string }[] = []
     Object.keys(byDate).sort().forEach((date) => {

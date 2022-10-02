@@ -1,8 +1,9 @@
 import * as XLSX from 'xlsx'
-import { ITransactionData, statementColMap, StatementRow } from '../types/Types'
+import moment from 'moment'
+import { dateProperties, ITransactionData, statementColMap, StatementRow } from '../types/Types'
 
-function toStatement(rowObj: {[key: string]: string}): StatementRow {
-  const dataObj: {[key: string]: string} = {}
+function toStatement(rowObj: {[key: string]: unknown}): StatementRow {
+  const dataObj: {[key: string]: unknown} = {}
   Object.keys(rowObj).forEach((col) => {
     const objKey = Object.keys(statementColMap).find((key) => {
       return statementColMap[key].includes(col.toLowerCase())
@@ -10,7 +11,11 @@ function toStatement(rowObj: {[key: string]: string}): StatementRow {
     if (!objKey) {
       console.log('not mapping:', col, rowObj[col])
     } else if (objKey !== 'Ignore') {
-      dataObj[objKey] = rowObj[col]
+      let value = rowObj[col]
+      if (dateProperties.includes(objKey) && typeof value === 'string') {
+        value = moment(value).toDate()
+      }
+      dataObj[objKey] = value
     }
   })
   return dataObj as unknown as StatementRow
@@ -23,7 +28,9 @@ export function loadStatementFile(data: string): { sheetHeaders: string[]; rows:
   }, [])
   const workbook = XLSX.read(data, {
     type: 'binary',
-    raw: true
+    cellDates: true,
+    dateNF: "dd/mm/yyyy",
+    raw: false
   });
   const sheetName = workbook.SheetNames[0]
   const workSheet = workbook.Sheets[sheetName]
@@ -44,7 +51,10 @@ export function loadStatementFile(data: string): { sheetHeaders: string[]; rows:
     throw new Error('header row not found')
   }
 
-  const asJson = XLSX.utils.sheet_to_json<{[key: string]: string}>(workSheet, { range: { s: { c:0, r:startIndex }, e: sheetRange.e}})
+  const opts = {
+    range: { s: { c:0, r:startIndex }, e: sheetRange.e}
+  }
+  const asJson = XLSX.utils.sheet_to_json<{[key: string]: string}>(workSheet, opts)
   const rows = asJson.map(toStatement)
   return { sheetHeaders, rows }
 }
@@ -61,10 +71,10 @@ export function getByLocation(data: ITransactionData[]) {
   return getMultiByKeyProp('territory', data)
 }
 
-export function getMultiByKeyProp(key: keyof ITransactionData, data: ITransactionData[]) {
-  const byKeyProp: {[key: string]: ITransactionData[]} = {}
+export function getMultiByKeyProp<T extends object>(key: keyof T, data: T[]) {
+  const byKeyProp: {[key: string]: T[]} = {}
   data.forEach((row) => {
-    const rowValue = row[key]
+    const rowValue = row[key]?.toString()
     if (!rowValue) return
     !byKeyProp[rowValue] && (byKeyProp[rowValue] = [])
     byKeyProp[rowValue].push(row)

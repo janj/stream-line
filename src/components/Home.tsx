@@ -1,4 +1,5 @@
 import React from 'react'
+import moment from 'moment'
 import { ITransactionData, StatementRow } from '../types/Types'
 import { StatementsData, StatementsSelector } from './FileSelector'
 import TrackDetails from './transactionViews/TrackDetails'
@@ -13,7 +14,7 @@ function toTransactionData(statementRow: StatementRow): ITransactionData {
     artistName: statementRow.Artist,
     platformName: statementRow.Distributor,
     trackTitle: statementRow.TrackTitle,
-    date: statementRow.Date,
+    date: moment(statementRow.Date).toDate(),
     revenue: +statementRow.Revenue,
     isrc: statementRow.ISRC,
     territory: statementRow.Territory,

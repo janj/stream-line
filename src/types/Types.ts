@@ -7,16 +7,21 @@ export interface StatementRow {
   Distributor: string
   ISRC: string
   Label: string // not stored
-  PeriodFrom: string
-  PeriodTo: string
+  PeriodFrom?: Date
+  PeriodTo?: Date
   Quantity: number
   ReleaseTitle: string
   Revenue: number
   Territory: string
   TrackTitle: string
   UPC: string
-  Date: string
+  Date?: Date
 }
+
+// identifiy which properties need to be formatted
+export const dateProperties = [
+  'Date', 'PeriodFrom', 'PeriodTo'
+]
 
 export const statementColMap: {[key: string]: string[]} = {
   Artist: [HL.artist],
@@ -43,7 +48,7 @@ export const statementColMap: {[key: string]: string[]} = {
 }
 
 export interface ITransactionData {
-  date: string
+  date?: Date
   artistName?: string
   platformName: string
   quantity: number
@@ -51,4 +56,7 @@ export interface ITransactionData {
   revenue: number
   isrc: string
   territory: string
+  from?: Date
+  to?: Date
+  dateString?: string
 }

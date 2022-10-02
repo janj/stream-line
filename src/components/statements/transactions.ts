@@ -7,6 +7,7 @@ import {
 } from '../../parse/parseObj'
 import { Platform } from "./statements"
 import { BaseObject, User } from '../../parse/types'
+import moment from 'moment'
 
 const transactionKey = 'Transaction'
 
@@ -30,7 +31,7 @@ export class Transaction  extends ParseObj {
   get upc(): string {
     return this.getProperty('upc')
   }
-  get from() {
+  get from(): Date {
     return this.getProperty('from')
   }
   get quantity(): number {
@@ -51,10 +52,10 @@ export class Transaction  extends ParseObj {
   get isrc(): string {
     return this.getProperty('isrc')
   }
-  get to() {
+  get to(): Date {
     return this.getProperty('to')
   }
-  get date() {
+  get date(): Date {
     return this.getProperty('date')
   }
   get revenue(): number {
@@ -66,11 +67,14 @@ export class Transaction  extends ParseObj {
   get platformName(): string {
     return this.platform.name
   }
+  get dateString(): string {
+    return this.date && moment(this.date).format('YYYY-MM-DD')
+  }
   get identifier(): string {
     return [
       this.upc,
       this.isrc,
-      this.date,
+      this.dateString,
       this.distributor,
       this.revenue,
       this.territory,
@@ -81,10 +85,12 @@ export class Transaction  extends ParseObj {
 }
 
 export function statementIdentifier(row: StatementRow) {
+  const date = row.Date || row.PeriodFrom
+  const dateString = date && moment(date).format('YYYY-MM-DD')
   return [
     row.UPC,
     row.ISRC,
-    row.Date || row.PeriodFrom,
+    dateString,
     row.Distributor,
     +row.Revenue,
     row.Territory,
