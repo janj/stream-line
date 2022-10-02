@@ -8,7 +8,7 @@ import {
 } from './transactions'
 import { StatementRow } from '../../types/Types'
 import { IArtistsByName } from '../artists/ArtistsManager'
-import { User } from '../login/utility'
+import { User } from '../../parse/types'
 
 export async function getTransactionManager(user: User) {
   const [artists, platforms] = await Promise.all([

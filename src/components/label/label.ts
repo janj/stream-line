@@ -1,5 +1,5 @@
-import { ParseObj, createNewObject, createQuery } from '../../types/parseObj'
-import { User } from '../login/utility'
+import { ParseObj, createNewObject, createQuery } from '../../parse/parseObj'
+import { User } from '../../parse/types'
 
 const labelKey = 'Label'
 

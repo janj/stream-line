@@ -1,6 +1,10 @@
 import Parse from 'parse'
+import { User } from './types'
 
-export type User = Parse.User
+export function initializeParse() {
+  Parse.initialize("ynIkTAKDSN7mx79IDrjsSm7yJJU43RsJe3fg3YKs","2rY3C47KmEDJ5ja3QmtObRzIYIL4dXYZ72A9Eq4W"); //PASTE HERE YOUR Back4App APPLICATION ID AND YOUR JavaScript KEY
+  Parse.serverURL = 'https://parseapi.back4app.com/'
+}
 
 export function getCurrentUser() {
   return Parse.User.current()

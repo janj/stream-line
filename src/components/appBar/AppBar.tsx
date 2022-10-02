@@ -2,8 +2,7 @@ import React from 'react'
 import { AppBar, Box, Button, Drawer, IconButton, Toolbar, Typography } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useSearchParams } from 'react-router-dom'
-import { RouteParams } from '../../App'
-import { UserContext } from '../contexts'
+import { RouteParams, UserContext } from '../contexts'
 
 export default function StreamLineAppBar() {
   const [showDrawer, setShowDrawer] = React.useState(false)

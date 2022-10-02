@@ -1,5 +1,6 @@
-import { BaseObject, createNewObject, createQuery, ParseObj } from '../../types/parseObj'
+import { createNewObject, createQuery, ParseObj } from '../../parse/parseObj'
 import { IArtist } from './artist'
+import { BaseObject } from '../../parse/types'
 
 const className = 'ArtistMapping'
 

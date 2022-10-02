@@ -1,6 +1,6 @@
 import React from 'react'
 import { LabelManager } from './label/label'
-import { User } from './login/utility'
+import { User } from '../parse/types'
 
 export const UserContext = React.createContext<{
   currentUser: User | undefined
@@ -19,3 +19,15 @@ export interface IUserDataContext {
 }
 
 export const UserDataContext = React.createContext<IUserDataContext>({})
+
+export enum RouteParams {
+  Labels = 'labels',
+  Login = 'login',
+  Artists = 'artists',
+  Statements = 'statements',
+  Transactions = 'transactions'
+}
+
+export interface IRouterContext {
+  goToPage: (page: RouteParams) => void
+}

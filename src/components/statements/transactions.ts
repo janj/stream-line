@@ -1,13 +1,12 @@
-import { StatementRow } from "../../types/Types"
+import { StatementRow } from '../../types/Types'
 import { IArtist } from "../artists/artist"
 import {
   ParseObj,
-  BaseObject,
   createNewObject,
   createQuery
-} from '../../types/parseObj'
+} from '../../parse/parseObj'
 import { Platform } from "./statements"
-import { User } from '../login/utility'
+import { BaseObject, User } from '../../parse/types'
 
 const transactionKey = 'Transaction'
 

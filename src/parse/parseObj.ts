@@ -1,7 +1,5 @@
 import Parse from 'parse'
-
-export type BaseObject = Parse.Object
-export type ObjectQuery = Parse.Query
+import { BaseObject, User } from './types'
 
 export interface IParseObj {
   parseObj: BaseObject
@@ -19,6 +17,10 @@ export class ParseObj {
   getProperty(propKey: string) {
     return this.parseObj.get(propKey)
   }
+}
+
+export function getCurrentUser(): User | undefined {
+  return Parse.User.current()
 }
 
 export function createNewObject(objectType: string, params: { [key: string]: unknown }): BaseObject {

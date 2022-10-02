@@ -1,4 +1,4 @@
-import { createNewObject, createQuery, ParseObj } from '../../types/parseObj'
+import { createNewObject, createQuery, ParseObj } from '../../parse/parseObj'
 
 const statementHeadersKey = 'StatementHeaders'
 const platformKey = 'Platform'

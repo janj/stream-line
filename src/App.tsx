@@ -15,22 +15,14 @@ import {
   doUserLogout,
   doUserRegistration,
   getCurrentUser
-} from './components/login/utility'
+} from './parse/utility'
 import LabelsView from './components/label/LabelsView'
 import { getLabelManager, LabelManager } from './components/label/label'
-import { UserContext, UserDataContext } from './components/contexts'
+import { RouteParams, UserContext, UserDataContext } from './components/contexts'
 
 function useQuery() {
   const { search } = useLocation();
   return React.useMemo(() => new URLSearchParams(search), [search]);
-}
-
-export enum RouteParams {
-  Labels = 'labels',
-  Login = 'login',
-  Artists = 'artists',
-  Statements = 'statements',
-  Transactions = 'transactions'
 }
 
 const componentMap = {

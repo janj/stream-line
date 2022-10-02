@@ -1,4 +1,4 @@
-import { createNewObject, createQuery, IParseObj, ParseObj } from '../../types/parseObj'
+import { createNewObject, createQuery, IParseObj, ParseObj } from '../../parse/parseObj'
 
 const className = 'Artist'
 
