@@ -37,7 +37,7 @@ export default function Filters({ sheet, onFiltersChanged }: {
   return <Box>
     <Select
       value={currentArtist}
-      onChange={(e) => setCurrentArtist(e.target.value as string)}
+      onChange={({ target: { value }}) => setCurrentArtist(value)}
       style={{padding: 6, margin: 6}}
     >
       <MenuItem value={ALL}>All</MenuItem>

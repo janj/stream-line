@@ -34,7 +34,7 @@ export function TransactionsView() {
         setTransactions(sorted)
       })
     })
-    getTransactionsCount().then(setTotalCount)
+    getTransactionsCount(currentUser).then(setTotalCount)
   }, [currentUser])
 
   React.useEffect(() => {
