@@ -107,8 +107,8 @@ export function createTransaction({ user, platform, artist, row }: {
 }) {
   const params = {
     user,
-    artist,
-    platform,
+    artist: artist.parseObj,
+    platform: platform.parseObj,
     contentType: row.ContentType,
     distributor: row.Distributor,
     isrc: row.ISRC,
@@ -143,8 +143,9 @@ export async function getAllTransactions(
       if (i === 0) console.log(orig.length)
       const artistObj = parseObj.get('artist')
       let artist: IArtist | undefined
-      if (artistObj) artist = artists[artistObj.parseObj.id]
-      const platform = platforms[parseObj.get('platform').parseObj.id]
+      if (artistObj) artist = artists[artistObj.id]
+      const platformObj = parseObj.get('platform')
+      const platform = platforms[platformObj.id]
       return new Transaction({ parseObj, artist, platform })
     })
     if (transactions.length < skip + transactionLimit) {
@@ -157,8 +158,7 @@ export async function getAllTransactions(
   })
 }
 
-export async function getTransactionsCount() {
-  const user = Parse.User.current
-  const query = new Parse.Query(transactionKey).equalTo('user', user)
+export async function getTransactionsCount(user: User) {
+  const query = createQuery(transactionKey).equalTo('user', user)
   return query.count()
 }

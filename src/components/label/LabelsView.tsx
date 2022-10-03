@@ -60,7 +60,7 @@ function LabelView({ labelId }: { labelId: string }) {
   React.useEffect(() => {
     if (!labelManager) return
     setLabel(labelManager.forId(labelId))
-  }, [labelManager])
+  }, [labelManager, labelId])
 
   if (!labelManager) {
     return <Box>Loading...</Box>
