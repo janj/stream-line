@@ -102,12 +102,12 @@ export function statementIdentifier(row: StatementRow) {
 export function createTransaction({ user, platform, artist, row }: {
   user: User
   platform: Platform
-  artist: IArtist
+  artist?: IArtist
   row: StatementRow
 }) {
   const params = {
     user,
-    artist: artist.parseObj,
+    artist: artist?.parseObj,
     platform: platform.parseObj,
     contentType: row.ContentType,
     distributor: row.Distributor,

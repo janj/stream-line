@@ -18,10 +18,10 @@ export class Platform extends ParseObj {
 
 export class PlatformHeader extends ParseObj {
   get platformId() {
-    return this.parseObj.get('platform').parseObj.id
+    return this.parseObj.get('platform').id
   }
   get headerId() {
-    return this.parseObj.get('header').parseObj.id
+    return this.parseObj.get('header').id
   }
 }
 

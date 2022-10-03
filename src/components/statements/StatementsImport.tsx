@@ -1,12 +1,12 @@
-import React from 'react';
+import React from 'react'
 import { Box, Button, MenuItem, Select, TextField } from '@mui/material'
-import { IStatementData, StatementsData, StatementsSelector } from '../FileSelector';
-import { artistsFromSheetData, statementDatesFromRows } from './utility';
-import { ArtistsManager, getArtistsManager } from '../artists/ArtistsManager';
-import { ArtistsImport } from '../artists/ArtistsImport';
-import { ConfirmCommitButton } from '../utility/ConfirmCommitButton';
+import { IStatementData, StatementsData, StatementsSelector } from '../FileSelector'
+import { artistsFromSheetData, statementDatesFromRows } from './utility'
+import { ArtistsManager, getArtistsManager } from '../artists/ArtistsManager'
+import { ArtistsImport } from '../artists/ArtistsImport'
+import { ConfirmCommitButton } from '../utility/ConfirmCommitButton'
 import { getStatementsManager, StatementsManager } from './StatementsManager'
-import { Platform } from './statements';
+import { Platform } from './statements'
 import { filterExisting, TransactionsManager } from './TransactionsManager'
 import { StatementRow } from '../../types/Types'
 import { Transaction } from './transactions'
@@ -106,15 +106,13 @@ function ManagedImport({ transactionsManager, platform, rows, statementsImport }
   const [dupTransactions, setDupTransactions] = React.useState<Transaction[]>([])
   const [completed, setCompleted] = React.useState(0)
 
-  function importStatement() {
-    return statementsImport(rows, setCompleted).then(() => {
-      transactionsManager.getTransactions().then((trx) => {
-        const { toImport, toExclude, dupTransactions } = filterExisting(platform, trx, rows)
-        setToImport(toImport)
-        setToExclude(toExclude)
-        setDupTransactions(dupTransactions)
-      })
-    })
+  async function importStatement() {
+    await statementsImport(rows, setCompleted)
+    const trx = await transactionsManager.getTransactions()
+    const { toImport, toExclude, dupTransactions } = filterExisting(platform, trx, rows)
+    setToImport(toImport)
+    setToExclude(toExclude)
+    setDupTransactions(dupTransactions)
   }
 
   React.useEffect(() => {

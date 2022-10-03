@@ -4,7 +4,7 @@ import { FileData, loadFiles } from './statements/utility'
 import { StatementRow } from '../types/Types'
 import { loadStatementFile } from './Helpers'
 
-function FileSelector({ label, onLoad }: { label?: string; onLoad: (data: FileData) => void }) {
+export function FileSelector({ label, onLoad }: { label?: string; onLoad: (data: FileData) => void }) {
   const [displayFiles, setDisplayFiles] = React.useState(false)
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
 
