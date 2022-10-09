@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect } from 'react';
 import { Box } from '@mui/material'
 import { StatementsData, StatementsSelector } from '../FileSelector'
 import { StatementRow } from '../../types/Types'
@@ -7,10 +7,10 @@ import { ArtistsImport } from './ArtistsImport'
 import { ArtistsManager, getArtistsManager } from './ArtistsManager'
 
 export function Management() {
-  const [statementArtists, setStatementArtists] = React.useState<string[]>([])
-  const [manager, setManager] = React.useState<ArtistsManager>()
+  const [statementArtists, setStatementArtists] = useState<string[]>([])
+  const [manager, setManager] = useState<ArtistsManager>()
 
-  React.useEffect(() => {
+  useEffect(() => {
     getArtistsManager().then(setManager)
   }, [])
 

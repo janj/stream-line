@@ -1,14 +1,14 @@
-import React from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Box, Button, TextField } from '@mui/material'
 import { UserContext } from '../contexts'
 
 export default function Login() {
-  const [username, setUsername] = React.useState('')
-  const [password, setPassword] = React.useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
-  const { currentUser, userLogin, userLogout, userRegister } = React.useContext(UserContext)
+  const { currentUser, userLogin, userLogout, userRegister } = useContext(UserContext)
 
-  React.useEffect(() => {
+  useEffect(() => {
     setUsername('')
     setPassword('')
   }, [currentUser])

@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState } from 'react';
 import { ConfirmCommitButton } from './ConfirmCommitButton'
 import { ButtonProps } from '@material-ui/core/Button/Button'
 
@@ -13,7 +13,7 @@ export default function AutoDisableButton({
   children,
   ...props
 }: IProps) {
-  const [disabled, setDisabled] = React.useState(false)
+  const [disabled, setDisabled] = useState(false)
   const onDisableClick = () => {
     setDisabled(true)
     onClick().then(() => setDisabled(stayDisabled || false))

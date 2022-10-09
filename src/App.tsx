@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom'
 import './App.css';
 import Home from './components/Home'
@@ -44,14 +44,14 @@ function useComponent() {
 }
 
 function ProvidersWrapper({children}: {children: any}) {
-  const [currentUser, setCurrentUser] = React.useState<User>()
-  const [labelManager, setLabelManager] = React.useState<LabelManager>()
+  const [currentUser, setCurrentUser] = useState<User>()
+  const [labelManager, setLabelManager] = useState<LabelManager>()
 
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentUser(getCurrentUser())
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!currentUser) return
     getLabelManager(currentUser).then(setLabelManager)
   }, [currentUser])

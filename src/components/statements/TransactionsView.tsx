@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useContext, useEffect } from 'react';
 import { Box } from '@mui/material'
 import { getTransactionsCount, Transaction } from './transactions'
 import { getTransactionManager, TransactionsManager } from './TransactionsManager'
@@ -11,17 +11,17 @@ import { UserContext } from '../contexts'
 
 
 export function TransactionsView() {
-  const [manager, setManager] = React.useState<TransactionsManager>()
-  const [transactions, setTransactions] = React.useState<Transaction[]>([])
-  const [totalCount, setTotalCount] = React.useState(0)
-  const [minDate, setMinDate] = React.useState<Date>()
-  const [maxDate, setMaxDate] = React.useState<Date>()
-  const [currentSet, setCurrenctSet] = React.useState<Transaction[]>([])
-  const [selectedDateRange, setSelectedDateRange] = React.useState<IDateRange>({})
+  const [manager, setManager] = useState<TransactionsManager>()
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [minDate, setMinDate] = useState<Date>()
+  const [maxDate, setMaxDate] = useState<Date>()
+  const [currentSet, setCurrenctSet] = useState<Transaction[]>([])
+  const [selectedDateRange, setSelectedDateRange] = useState<IDateRange>({})
 
-  const { currentUser } = React.useContext(UserContext)
+  const { currentUser } = useContext(UserContext)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!currentUser) return
     getTransactionManager(currentUser).then((manager) => {
       setManager(manager)
@@ -37,7 +37,7 @@ export function TransactionsView() {
     getTransactionsCount(currentUser).then(setTotalCount)
   }, [currentUser])
 
-  React.useEffect(() => {
+  useEffect(() => {
     let startIndex = 0
     const { startDate, endDate } = selectedDateRange
     if (startDate) {

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Box, Button, MenuItem, Select } from '@mui/material'
 import { IArtist } from './artist'
 import { ArtistsManager, IArtistsByName, IMappingsByName } from './ArtistsManager'
@@ -7,18 +7,18 @@ export function ArtistsImport({manager, statementArtists}: {
   manager: ArtistsManager
   statementArtists: string[]
 }) {
-  const [mappings, setMappings] = React.useState<IMappingsByName>({})
-  const [artists, setArtists] = React.useState<IArtistsByName>({})
-  const [neither, setNeither] = React.useState<string[]>([])
+  const [mappings, setMappings] = useState<IMappingsByName>({})
+  const [artists, setArtists] = useState<IArtistsByName>({})
+  const [neither, setNeither] = useState<string[]>([])
 
-  const artistSort = React.useCallback(() => {
+  const artistSort = useCallback(() => {
     const {artists, mapped, neither} = manager.sortNames(statementArtists)
     setArtists(artists)
     setMappings(mapped)
     setNeither(neither)
   }, [manager, statementArtists])
 
-  React.useEffect(() => {
+  useEffect(() => {
     artistSort()
   }, [artistSort])
 
@@ -57,7 +57,7 @@ function ArtistImport({ name, manager, onUpdate }: {
   manager: ArtistsManager
   onUpdate: () => void
 }) {
-  const [isMapping, setIsMapping] = React.useState(false)
+  const [isMapping, setIsMapping] = useState(false)
 
   function doIt() {
     manager.createArtist({ name }).then(onUpdate)
@@ -81,7 +81,7 @@ function GetArtist({ manager, onSelect }: {
   manager: ArtistsManager
   onSelect: (artist: IArtist) => void
 }) {
-  const [selected, setSelected] = React.useState<string>()
+  const [selected, setSelected] = useState<string>()
 
   return <Box>
     <Select

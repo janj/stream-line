@@ -1,4 +1,3 @@
-import React from 'react'
 import { DataGrid, GridColDef } from '@material-ui/data-grid'
 import { ITransactionData } from '../../types/Types'
 

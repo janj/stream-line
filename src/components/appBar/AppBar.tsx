@@ -1,11 +1,11 @@
-import React from 'react'
+import { useState, useContext } from 'react';
 import { AppBar, Box, Button, Drawer, IconButton, Toolbar, Typography } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useSearchParams } from 'react-router-dom'
 import { RouteParams, UserContext } from '../contexts'
 
 export default function StreamLineAppBar() {
-  const [showDrawer, setShowDrawer] = React.useState(false)
+  const [showDrawer, setShowDrawer] = useState(false)
 
   return <Box sx={{ flexGrow: 1 }}>
     <AppBar position={"static"}>
@@ -58,7 +58,7 @@ function StreamLineDrawer({ show, onClose }: { show: boolean; onClose: () => voi
 function LoginButton() {
   const [_searchParams, setSearchParams] = useSearchParams()
 
-  const { currentUser, userLogout } = React.useContext(UserContext)
+  const { currentUser, userLogout } = useContext(UserContext)
 
   async function logout() {
     userLogout()

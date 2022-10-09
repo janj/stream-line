@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useContext, useEffect } from 'react';
 import { Box, Button, MenuItem, Select, TextField } from '@mui/material'
 import { IStatementData, StatementsData, StatementsSelector } from '../FileSelector'
 import { artistsFromSheetData, statementDatesFromRows } from './utility'
@@ -14,19 +14,19 @@ import AutoDisableButton from '../utility/AutoDisableButton'
 import { UserContext } from '../contexts'
 
 export function StatementsImport() {
-  const [statementData, setStatementData] = React.useState<StatementsData>({})
-  const [artistManager, setArtistManager] = React.useState<ArtistsManager>()
-  const [statementsManager, setStatementsManager] = React.useState<StatementsManager>()
-  const [transactionsManager, setTransactionsManager] = React.useState<TransactionsManager>()
+  const [statementData, setStatementData] = useState<StatementsData>({})
+  const [artistManager, setArtistManager] = useState<ArtistsManager>()
+  const [statementsManager, setStatementsManager] = useState<StatementsManager>()
+  const [transactionsManager, setTransactionsManager] = useState<TransactionsManager>()
 
-  const { currentUser } = React.useContext(UserContext)
+  const { currentUser } = useContext(UserContext)
 
-  React.useEffect(() => {
+  useEffect(() => {
     getArtistsManager().then(setArtistManager)
     getStatementsManager().then(setStatementsManager)
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!statementsManager || !artistManager || !currentUser) return
     const artists = Object.values(artistManager.artistsByName)
     setTransactionsManager(new TransactionsManager(currentUser, artists, statementsManager.platforms))
@@ -50,17 +50,17 @@ function StatementImport({ name, data: { rows, sheetHeaders }, artistManager, st
   statementsManager: StatementsManager
   transactionsManager: TransactionsManager
 }) {
-  const [showDetails, setShowDetails] = React.useState(false)
-  const [statementArtists, setStatementArtists] = React.useState<string[]>([])
-  const [dates, setDates] = React.useState<{fromDate?: string; toDate?: string}>({})
-  const [identifiedPlatform, setIdentifiedPlatform] = React.useState<Platform>()
+  const [showDetails, setShowDetails] = useState(false)
+  const [statementArtists, setStatementArtists] = useState<string[]>([])
+  const [dates, setDates] = useState<{fromDate?: string; toDate?: string}>({})
+  const [identifiedPlatform, setIdentifiedPlatform] = useState<Platform>()
 
-  React.useEffect(() => {
+  useEffect(() => {
     setStatementArtists(artistsFromSheetData(rows))
     setDates(statementDatesFromRows(rows))
   }, [rows])
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIdentifiedPlatform(statementsManager.platformForHeaders(sheetHeaders))
   }, [sheetHeaders, statementsManager])
 
@@ -101,10 +101,10 @@ function ManagedImport({ transactionsManager, platform, rows, statementsImport }
   rows: StatementRow[]
   statementsImport: (rows: StatementRow[], progress: (done: number) => void) => Promise<unknown>
 }) {
-  const [toImport, setToImport] = React.useState<StatementRow[]>([])
-  const [toExclude, setToExclude] = React.useState<StatementRow[]>([])
-  const [dupTransactions, setDupTransactions] = React.useState<Transaction[]>([])
-  const [completed, setCompleted] = React.useState(0)
+  const [toImport, setToImport] = useState<StatementRow[]>([])
+  const [toExclude, setToExclude] = useState<StatementRow[]>([])
+  const [dupTransactions, setDupTransactions] = useState<Transaction[]>([])
+  const [completed, setCompleted] = useState(0)
 
   async function importStatement() {
     await statementsImport(rows, setCompleted)
@@ -115,7 +115,7 @@ function ManagedImport({ transactionsManager, platform, rows, statementsImport }
     setDupTransactions(dupTransactions)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     transactionsManager.getTransactions().then((trx) => {
       const { toImport, toExclude, dupTransactions } = filterExisting(platform, trx, rows)
       setToImport(toImport)
@@ -138,17 +138,17 @@ function PlatformImport({ headers, statementsManager, identifiedPlatform }: {
   statementsManager: StatementsManager
   identifiedPlatform?: Platform
 }) {
-  const [missingHeaders, setMissingHeaders] = React.useState<string[]>([])
-  const [newPlatform, setNewPlatform] = React.useState('')
-  const [showImport, setShowImport] = React.useState(false)
-  const [selectedPlatform, setSelectedPlatform] = React.useState(identifiedPlatform?.id || '')
-  const [existingPlatforms, setExistingPlatforms] = React.useState<{[id: string]: Platform}>({})
+  const [missingHeaders, setMissingHeaders] = useState<string[]>([])
+  const [newPlatform, setNewPlatform] = useState('')
+  const [showImport, setShowImport] = useState(false)
+  const [selectedPlatform, setSelectedPlatform] = useState(identifiedPlatform?.id || '')
+  const [existingPlatforms, setExistingPlatforms] = useState<{[id: string]: Platform}>({})
 
-  React.useEffect(() => {
+  useEffect(() => {
     setMissingHeaders(statementsManager.getMissingHeaders(...headers))
   }, [headers, statementsManager])
 
-  React.useEffect(() => {
+  useEffect(() => {
     setExistingPlatforms(statementsManager.platformsById)
   }, [statementsManager])
 

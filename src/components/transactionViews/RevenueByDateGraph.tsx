@@ -8,13 +8,13 @@ import {
   XAxis,
   YAxis
 } from 'recharts'
-import React from 'react'
+import { useState, useEffect } from 'react';
 
 export default function RevenueByDateGraph({ datas }: { datas: {[key: string]: StatementRow[]}}) {
-  const [chartData, setChartData] = React.useState<{ [kdy: string]: string }[]>()
-  const [lines, setLines] = React.useState<{ [key: string]: string }>({})
+  const [chartData, setChartData] = useState<{ [kdy: string]: string }[]>()
+  const [lines, setLines] = useState<{ [key: string]: string }>({})
 
-  React.useEffect(() => {
+  useEffect(() => {
     const byDate: {
       [name: string]: { [key: string]: number }
     } = {}

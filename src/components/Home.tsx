@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState } from 'react';
 import moment from 'moment'
 import { ITransactionData, StatementRow } from '../types/Types'
 import { StatementsData, StatementsSelector } from './FileSelector'
@@ -30,10 +30,10 @@ function mapArtists(rows: StatementRow[], mapping: {[name: string]: IArtistMappi
 }
 
 export default function Home() {
-  const [sheet, setSheet] = React.useState<ITransactionData[]>([])
-  const [mappings, setMappings] = React.useState<{[name: string]: IArtistMapping}>()
+  const [sheet, setSheet] = useState<ITransactionData[]>([])
+  const [mappings, setMappings] = useState<{[name: string]: IArtistMapping}>()
 
-  React.useState(() => {
+  useState(() => {
     getArtists().then((allArtists) => {
       getMappings(allArtists).then(setMappings)
     })

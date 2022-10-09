@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect } from 'react';
 import { getByLocation } from '../Helpers'
 import { ApexOptions } from 'apexcharts'
 import ReactApexChart from 'react-apexcharts'
@@ -7,20 +7,20 @@ import Filters, { ALL, IFilters } from '../Filters'
 import { ITransactionData } from '../../types/Types'
 
 export default function Locations({ transactions }: { transactions: ITransactionData[] }) {
-  const [byLocation, setByLocation] = React.useState<{ [location: string]: ITransactionData[]}>({})
-  const [locations, setLocations] = React.useState<string[]>([])
-  const [currentArtist, setCurrentArtist] = React.useState('')
-  const [selectedSeries, setSelectedSeries] = React.useState('')
-  const [data, setData] = React.useState<number[]>([])
-  const [availableSeries, setAvailableSeries] = React.useState<{[label: string]: number[]}>({})
+  const [byLocation, setByLocation] = useState<{ [location: string]: ITransactionData[]}>({})
+  const [locations, setLocations] = useState<string[]>([])
+  const [currentArtist, setCurrentArtist] = useState('')
+  const [selectedSeries, setSelectedSeries] = useState('')
+  const [data, setData] = useState<number[]>([])
+  const [availableSeries, setAvailableSeries] = useState<{[label: string]: number[]}>({})
 
-  React.useEffect(() => {
+  useEffect(() => {
     const byLocation = getByLocation(transactions)
     setLocations(Object.keys(byLocation))
     setByLocation(byLocation)
   }, [transactions])
 
-  React.useEffect(() => {
+  useEffect(() => {
     const revenue: number[] = []
     const streams: number[] = []
     Object.keys(byLocation).forEach((retailer) => {
@@ -38,7 +38,7 @@ export default function Locations({ transactions }: { transactions: ITransaction
     setAvailableSeries({ revenue, streams })
   }, [currentArtist, byLocation])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (availableSeries[selectedSeries]) {
       setData([...availableSeries[selectedSeries]])
     }

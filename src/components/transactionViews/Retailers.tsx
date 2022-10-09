@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts'
 import { getByRetailer } from '../Helpers'
 import { ApexOptions } from 'apexcharts'
@@ -7,14 +7,14 @@ import Filters, { ALL, IFilters } from '../Filters'
 import { ITransactionData } from '../../types/Types'
 
 export default function Retailers({ transactions }: { transactions: ITransactionData[] }) {
-  const [byRetailer, setByRetailer] = React.useState<{[retailer: string]: ITransactionData[]}>({})
-  const [currentSeries, setSeries] = React.useState<{ data: number[] }[]>([])
-  const [currentCategories, setCategories] = React.useState<string[]>([])
-  const [currentArtist, setCurrentArtist] = React.useState('')
-  const [availableSeries, setAvailableSeries] = React.useState<{[label: string]: number[]}>({})
-  const [selectedSeries, setSelectedSeries] = React.useState('')
+  const [byRetailer, setByRetailer] = useState<{[retailer: string]: ITransactionData[]}>({})
+  const [currentSeries, setSeries] = useState<{ data: number[] }[]>([])
+  const [currentCategories, setCategories] = useState<string[]>([])
+  const [currentArtist, setCurrentArtist] = useState('')
+  const [availableSeries, setAvailableSeries] = useState<{[label: string]: number[]}>({})
+  const [selectedSeries, setSelectedSeries] = useState('')
 
-  React.useEffect(() => {
+  useEffect(() => {
     const byRetailer = getByRetailer(transactions)
     const categories: string[] = []
     Object.keys(byRetailer).forEach((retailer) => {
@@ -24,7 +24,7 @@ export default function Retailers({ transactions }: { transactions: ITransaction
     setCategories(categories)
   }, [transactions])
 
-  React.useEffect(() => {
+  useEffect(() => {
     const revenue: number[] = []
     const streams: number[] = []
     Object.keys(byRetailer).forEach((retailer) => {
@@ -43,7 +43,7 @@ export default function Retailers({ transactions }: { transactions: ITransaction
     setSeries([{ data: streams }])
   }, [currentArtist, byRetailer])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (availableSeries[selectedSeries]) {
       setSeries([{data: availableSeries[selectedSeries]}])
     }

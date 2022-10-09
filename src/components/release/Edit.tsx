@@ -1,13 +1,13 @@
 import { IRelease, IReleaseIds, ReleaseIdType } from '../label/release'
-import React from 'react'
+import { useState, useEffect } from 'react';
 import { Box, Button, MenuItem, Select, TextField } from '@mui/material'
 
 export default function Edit({ release }: { release: IRelease }) {
-  const [idType, setIdType] = React.useState<ReleaseIdType>(ReleaseIdType.ISRC)
-  const [idValue, setIdValue] = React.useState('')
-  const [releaseIds, setReleaseIds] = React.useState<IReleaseIds | undefined>()
+  const [idType, setIdType] = useState<ReleaseIdType>(ReleaseIdType.ISRC)
+  const [idValue, setIdValue] = useState('')
+  const [releaseIds, setReleaseIds] = useState<IReleaseIds | undefined>()
 
-  React.useEffect(() => {
+  useEffect(() => {
     setReleaseIds(release.releaseIds)
   }, [release])
 

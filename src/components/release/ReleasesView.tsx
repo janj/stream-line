@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect } from 'react';
 import { Box, Button } from '@mui/material'
 import { ILabel } from '../label/label'
 import { getReleaseManager, IRelease, ReleaseManager } from '../label/release'
@@ -6,12 +6,12 @@ import Create from './Create'
 import Edit from './Edit'
 
 export default function ReleasesView({ label }: { label: ILabel }) {
-  const [releases, setReleases] = React.useState<IRelease[]>([])
-  const [releaseManager, setReleaseManager] = React.useState<ReleaseManager>()
-  const [showCreate, setShowCreate] = React.useState(false)
-  const [editRelease, setEditRelease] = React.useState<IRelease | undefined>()
+  const [releases, setReleases] = useState<IRelease[]>([])
+  const [releaseManager, setReleaseManager] = useState<ReleaseManager>()
+  const [showCreate, setShowCreate] = useState(false)
+  const [editRelease, setEditRelease] = useState<IRelease | undefined>()
 
-  React.useEffect(() => {
+  useEffect(() => {
     getReleaseManager(label).then((manager) => {
       setReleaseManager(manager)
       setReleases(manager.releases)

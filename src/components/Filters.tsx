@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect } from 'react';
 import { Box, MenuItem, Select } from '@mui/material'
 import { ITransactionData } from '../types/Types'
 
@@ -14,11 +14,11 @@ export default function Filters({ sheet, onFiltersChanged }: {
   sheet: ITransactionData[]
   onFiltersChanged: (filters: IFilters) => void}
 ) {
-  const [currentArtist, setCurrentArtist] = React.useState('')
-  const [currentSeries, setCurrentSeries] = React.useState('')
-  const [allArtists, setAllArtists] = React.useState<string[]>([])
+  const [currentArtist, setCurrentArtist] = useState('')
+  const [currentSeries, setCurrentSeries] = useState('')
+  const [allArtists, setAllArtists] = useState<string[]>([])
 
-  React.useEffect(() => {
+  useEffect(() => {
     const artists: string[] = []
     sheet.forEach((row) => {
       if (row.artistName && !artists.includes(row.artistName)) {
@@ -30,7 +30,7 @@ export default function Filters({ sheet, onFiltersChanged }: {
     setCurrentSeries(SERIES_TYPES[0])
   }, [sheet])
 
-  React.useEffect(() => {
+  useEffect(() => {
     onFiltersChanged({ artist: currentArtist, streamOrRevenue: currentSeries})
   }, [currentSeries, currentArtist, onFiltersChanged])
 

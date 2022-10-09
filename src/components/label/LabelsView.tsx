@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useContext, useEffect } from 'react';
 import { Box, Button, TextField } from '@mui/material'
 import { RouteParams, UserDataContext } from '../contexts'
 import { ILabel } from './label'
@@ -6,18 +6,18 @@ import { useSearchParams } from 'react-router-dom'
 import ReleasesView from '../release/ReleasesView'
 
 export default function LabelsView() {
-  const [labels, setLabels] = React.useState<ILabel[]>([])
-  const [labelId, setLabelId] = React.useState<null | string>()
+  const [labels, setLabels] = useState<ILabel[]>([])
+  const [labelId, setLabelId] = useState<null | string>()
 
-  const { labelManager } = React.useContext(UserDataContext)
+  const { labelManager } = useContext(UserDataContext)
   const [searchParams, setSearchParams] = useSearchParams()
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!labelManager) return
     setLabels(Object.values(labelManager.allLabels))
   }, [labelManager])
 
-  React.useEffect(() => {
+  useEffect(() => {
     setLabelId(searchParams.get(RouteParams.Labels))
   }, [searchParams])
 
@@ -44,7 +44,7 @@ export default function LabelsView() {
 }
 
 function LabelCreate({ createLabel }: { createLabel: (name: string) => unknown }) {
-  const [name, setName] = React.useState('')
+  const [name, setName] = useState('')
 
   return <Box padding={'20px'}>
     <Box>Create a new label:</Box>
@@ -54,10 +54,10 @@ function LabelCreate({ createLabel }: { createLabel: (name: string) => unknown }
 }
 
 function LabelView({ labelId }: { labelId: string }) {
-  const [label, setLabel] = React.useState<ILabel | undefined>()
-  const { labelManager } = React.useContext(UserDataContext)
+  const [label, setLabel] = useState<ILabel | undefined>()
+  const { labelManager } = useContext(UserDataContext)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!labelManager) return
     setLabel(labelManager.forId(labelId))
   }, [labelManager, labelId])
