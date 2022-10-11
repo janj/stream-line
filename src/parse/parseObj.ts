@@ -10,6 +10,11 @@ export class WrappedObj {
   constructor(parseObj: BaseObject) {
     this.parseObj = parseObj
   }
+  async save() {
+    const newObj = await this.parseObj.save()
+    this.parseObj = newObj
+  }
+
   get id() {
     return this.parseObj.id
   }

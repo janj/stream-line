@@ -23,13 +23,19 @@ export interface IRelease extends IWrappedObj{
   id: string
   name: string
   releaseIds: IReleaseIds
-  addReleaseId: (idType: ReleaseIdType, value: string) => Promise<IReleaseIds>
-  removeReleaseId: (idType: ReleaseIdType, value: string) => Promise<IReleaseIds>
+  addReleaseId(idType: ReleaseIdType, value: string): Promise<IReleaseIds>
+  removeReleaseId(idType: ReleaseIdType, value: string): Promise<IReleaseIds>
+  updateName(newName: string): Promise<void>
 }
 
-class Release extends WrappedObj {
+class Release extends WrappedObj implements IRelease{
   get name(): string {
     return this.getProperty(Properties.Name)
+  }
+
+  async updateName(newName: string) {
+    this.setProperty(Properties.Name, newName)
+    return this.save()
   }
 
   get releaseIds() {
@@ -48,7 +54,7 @@ class Release extends WrappedObj {
     if (ids[idType].includes(value)) return ids
     ids[idType].push(value)
     this.setProperty(Properties.ReleaseIds, ids)
-    await this.parseObj.save()
+    await this.save()
     return this.releaseIds
   }
 
@@ -56,7 +62,7 @@ class Release extends WrappedObj {
     const ids = this.releaseIds
     ids[idType] = ids[idType].filter((rid: string) => rid !== value)
     this.setProperty(Properties.ReleaseIds, ids)
-    await this.parseObj.save()
+    await this.save()
     return this.releaseIds
   }
 }

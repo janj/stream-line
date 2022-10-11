@@ -1,11 +1,13 @@
 import { IRelease, IReleaseIds, ReleaseIdType } from '../label/release'
 import { useState, useEffect } from 'react';
 import { Box, Button, MenuItem, Select, TextField } from '@mui/material'
+import { ConfirmCommitButton } from '../utility/ConfirmCommitButton'
 
 export default function Edit({ release }: { release: IRelease }) {
   const [idType, setIdType] = useState<ReleaseIdType>(ReleaseIdType.ISRC)
   const [idValue, setIdValue] = useState('')
   const [releaseIds, setReleaseIds] = useState<IReleaseIds | undefined>()
+  const [releaseName, setReleaseName] = useState(release.name)
 
   useEffect(() => {
     setReleaseIds(release.releaseIds)
@@ -22,13 +24,21 @@ export default function Edit({ release }: { release: IRelease }) {
       .then((ids) => setReleaseIds({...ids}))
   }
 
+  async function updateReleaseName() {
+    await release.updateName(releaseName)
+  }
+
   return <Box>
     <Box>{release.name}</Box>
+    <Box>
+      <TextField value={releaseName} onChange={({ target: { value }}) => setReleaseName(value)}/>
+      <Button onClick={updateReleaseName}>Update</Button>
+    </Box>
     {releaseIds && Object.entries(releaseIds).map(([idType, ids]) => {
       if (!ids.length) return null
       return <Box key={idType}>
         <Box><b>{idType}</b></Box>
-        {ids.map((rid: string, i: number) => <Box onClick={() => removeId(idType as ReleaseIdType, rid)} key={i}>{rid}<Button>X</Button></Box>)}
+        {ids.map((rid: string, i: number) => <Box key={i}>{rid}<ConfirmCommitButton onClick={() => removeId(idType as ReleaseIdType, rid)}>X</ConfirmCommitButton></Box>)}
       </Box>
     })}
     <Select
