@@ -1,4 +1,4 @@
-import { createNewObject, createQuery, IParseObj, ParseObj } from '../../parse/parseObj'
+import { createNewObject, createQuery, IWrappedObj, WrappedObj } from '../../parse/parseObj'
 import { ILabel } from './label'
 
 const releaseKey = 'Release'
@@ -19,7 +19,7 @@ export interface IReleaseIds {
   [ReleaseIdType.UPC]: string[]
 }
 
-export interface IRelease extends IParseObj{
+export interface IRelease extends IWrappedObj{
   id: string
   name: string
   releaseIds: IReleaseIds
@@ -27,7 +27,7 @@ export interface IRelease extends IParseObj{
   removeReleaseId: (idType: ReleaseIdType, value: string) => Promise<IReleaseIds>
 }
 
-class Release extends ParseObj {
+class Release extends WrappedObj {
   get name(): string {
     return this.getProperty(Properties.Name)
   }
@@ -66,6 +66,11 @@ async function createRelease(label: ILabel, { name }: { name: string }) {
   const release = createNewObject(releaseKey, params)
   const newObj = await release.save()
   return new Release(newObj)
+}
+
+export async function getRelease(releaseId: string): Promise<Release> {
+  const query = createQuery(releaseKey)
+  return query.get(releaseId).then((obj) => new Release(obj))
 }
 
 async function getAllReleases(label: ILabel): Promise<Release[]> {

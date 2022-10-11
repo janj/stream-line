@@ -1,4 +1,4 @@
-import { createNewObject, createQuery, ParseObj } from '../../parse/parseObj'
+import { createNewObject, createQuery, WrappedObj } from '../../parse/parseObj'
 import { IArtist } from './artist'
 import { BaseObject } from '../../parse/types'
 
@@ -9,7 +9,7 @@ export interface IArtistMapping {
   mappedTo: IArtist
 }
 
-class ArtistMapping extends ParseObj {
+class ArtistMapping extends WrappedObj {
   artist: IArtist
 
   constructor(parseObj: BaseObject, artist: IArtist) {

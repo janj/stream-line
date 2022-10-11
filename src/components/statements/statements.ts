@@ -1,22 +1,22 @@
-import { createNewObject, createQuery, ParseObj } from '../../parse/parseObj'
+import { createNewObject, createQuery, WrappedObj } from '../../parse/parseObj'
 
 const statementHeadersKey = 'StatementHeaders'
 const platformKey = 'Platform'
 const platformHeadersKey = 'PlatformHeaders'
 
-export class StatementHeader extends ParseObj {
+export class StatementHeader extends WrappedObj {
   get label() {
     return this.parseObj.get('label')
   }
 }
 
-export class Platform extends ParseObj {
+export class Platform extends WrappedObj {
   get name() {
     return this.parseObj.get('name')
   }
 }
 
-export class PlatformHeader extends ParseObj {
+export class PlatformHeader extends WrappedObj {
   get platformId() {
     return this.parseObj.get('platform').id
   }

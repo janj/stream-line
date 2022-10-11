@@ -20,29 +20,23 @@ export async function getTransactionManager(user: User) {
 
 export class TransactionsManager {
   user: User
-  allArtists: {[id: string]: IArtist}
-  allPlatforms: {[id: string]: Platform}
+  allArtists: IArtist[]
+  allPlatforms: Platform[]
   transactionsPromise: Promise<Transaction[]> | undefined
   addedTransactions: Transaction[]
 
   constructor(user: User, allArtists: IArtist[], allPlatforms: Platform[]) {
     this.user = user
-    this.allArtists = allArtists.reduce((acc: {[id: string]: IArtist}, a) => {
-      acc[a.id] = a
-      return acc
-    }, {})
-    this.allPlatforms = allPlatforms.reduce((acc: {[id: string]: Platform}, p) => {
-      acc[p.id] = p
-      return acc
-    }, {})
+    this.allArtists = allArtists
+    this.allPlatforms = allPlatforms
     this.addedTransactions = []
   }
 
   getTransactions() {
-    if (this.transactionsPromise) return this.transactionsPromise
-    this.transactionsPromise = getAllTransactions(this.user, this.allArtists, this.allPlatforms)
-      .then((trx) => [...trx, ...this.addedTransactions])
-    return this.transactionsPromise
+    if (!this.transactionsPromise) {
+      this.transactionsPromise = getAllTransactions(this.user, this.allArtists, this.allPlatforms)
+    }
+    return this.transactionsPromise.then((trx) => [...trx, ...this.addedTransactions])
   }
 
   importStatementData(rows: StatementRow[], platform: Platform, artists: IArtistsByName, completed: (done: number) => void) {

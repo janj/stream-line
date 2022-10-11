@@ -1,11 +1,11 @@
 import Parse from 'parse'
-import { BaseObject, User } from './types'
+import { BaseObject, ObjectQuery, User } from './types'
 
-export interface IParseObj {
+export interface IWrappedObj {
   parseObj: BaseObject
 }
 
-export class ParseObj {
+export class WrappedObj {
   parseObj: BaseObject
   constructor(parseObj: BaseObject) {
     this.parseObj = parseObj
@@ -35,4 +35,8 @@ export function createNewObject(objectType: string, params?: { [key: string]: un
 
 export function createQuery(objectType: string) {
   return new Parse.Query(objectType)
+}
+
+export function orQuery(...queries: ObjectQuery[]) {
+  return Parse.Query.or(...queries)
 }

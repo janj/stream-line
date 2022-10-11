@@ -1,13 +1,13 @@
-import { createNewObject, createQuery, IParseObj, ParseObj } from '../../parse/parseObj'
+import { createNewObject, createQuery, IWrappedObj, WrappedObj } from '../../parse/parseObj'
 
 const className = 'Artist'
 
-export interface IArtist extends IParseObj{
+export interface IArtist extends IWrappedObj{
   id: string
   name: string
 }
 
-class Artist extends ParseObj {
+class Artist extends WrappedObj {
   get name() {
     return this.parseObj.get('name')
   }

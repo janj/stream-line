@@ -59,4 +59,5 @@ export interface ITransactionData {
   from?: Date
   to?: Date
   dateString?: string
+  upc?: string
 }

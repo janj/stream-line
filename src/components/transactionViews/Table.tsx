@@ -7,7 +7,9 @@ const gridCols: GridColDef[] = [
   {field: 'platformName', headerName: 'Platform', width: 150},
   {field: 'quantity', headerName: 'Quantity', width: 150},
   {field: 'trackTitle', headerName: 'Track', width: 150},
-  {field: 'revenue', headerName: 'Revenue', width: 150}
+  {field: 'revenue', headerName: 'Revenue', width: 150},
+  {field: 'isrc', headerName: 'ISRC', width: 150},
+  {field: 'upc', headerName: 'UPC', width: 150}
 ]
 
 export function TransactionsTable({ transactions }: { transactions: ITransactionData[] }) {

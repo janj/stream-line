@@ -25,5 +25,6 @@ export enum RouteParams {
   Login = 'login',
   Artists = 'artists',
   Statements = 'statements',
-  Transactions = 'transactions'
+  Transactions = 'transactions',
+  Release = 'release'
 }

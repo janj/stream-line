@@ -1,5 +1,6 @@
 import Parse from 'parse'
 import { User } from './types'
+import { createQuery } from './parseObj'
 
 export function initializeParse() {
   Parse.initialize("ynIkTAKDSN7mx79IDrjsSm7yJJU43RsJe3fg3YKs","2rY3C47KmEDJ5ja3QmtObRzIYIL4dXYZ72A9Eq4W"); //PASTE HERE YOUR Back4App APPLICATION ID AND YOUR JavaScript KEY
@@ -8,6 +9,12 @@ export function initializeParse() {
 
 export function getCurrentUser() {
   return Parse.User.current()
+}
+
+export async function getAllUsers(): Promise<User[]> {
+  // how to do this better
+  return await createQuery('User')
+    .find() as unknown as Promise<User[]>
 }
 
 export async function doUserRegistration({ username, password}: {

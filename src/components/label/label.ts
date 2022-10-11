@@ -1,14 +1,14 @@
-import { ParseObj, createNewObject, createQuery, IParseObj } from '../../parse/parseObj'
+import { WrappedObj, createNewObject, createQuery, IWrappedObj } from '../../parse/parseObj'
 import { User } from '../../parse/types'
 
 const labelKey = 'Label'
 
-export interface ILabel extends IParseObj{
+export interface ILabel extends IWrappedObj{
   id: string
   name: string
 }
 
-class Label extends ParseObj {
+class Label extends WrappedObj {
   get name(): string {
     return this.getProperty('name')
   }

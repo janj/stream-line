@@ -1,17 +1,19 @@
 import { StatementRow } from '../../types/Types'
-import { IArtist } from "../artists/artist"
+import { getArtists, IArtist } from '../artists/artist'
 import {
-  ParseObj,
+  WrappedObj,
   createNewObject,
-  createQuery
+  createQuery,
+  orQuery
 } from '../../parse/parseObj'
-import { Platform } from "./statements"
-import { BaseObject, User } from '../../parse/types'
+import { getPlatforms, Platform } from './statements'
+import { BaseObject, ObjectQuery, User } from '../../parse/types'
 import moment from 'moment'
+import { IRelease } from '../label/release'
 
 const transactionKey = 'Transaction'
 
-export class Transaction  extends ParseObj {
+export class Transaction  extends WrappedObj {
   artist: IArtist | undefined
   platform: Platform
 
@@ -99,7 +101,7 @@ export function statementIdentifier(row: StatementRow) {
   ].join(':')
 }
 
-export function createTransaction({ user, platform, artist, row }: {
+export async function createTransaction({ user, platform, artist, row }: {
   user: User
   platform: Platform
   artist?: IArtist
@@ -123,42 +125,71 @@ export function createTransaction({ user, platform, artist, row }: {
     date: row.Date || row.PeriodFrom
   }
   const transaction = createNewObject(transactionKey, params)
-  return transaction.save().then((parseObj) => new Transaction({parseObj, artist, platform}))
+  const parseObj = await transaction.save()
+  return new Transaction({parseObj, artist, platform})
 }
 
 const transactionLimit = 10000
 
+function byId<T extends { id: string }>(objs: T[]) {
+  return objs.reduce((acc: {[id: string]: T}, obj) => {
+    acc[obj.id] = obj
+    return acc
+  }, {})
+}
+
+function mapTransactionParseObjs(parseObjs: BaseObject[], artists: IArtist[], platforms: Platform[]) {
+  const artistsById = byId(artists)
+  const platformsById = byId(platforms)
+  return parseObjs.map((parseObj) => {
+    const artistObj = parseObj.get('artist')
+    let artist: IArtist | undefined
+    if (artistObj) artist = artistsById[artistObj.id]
+    const platformObj = parseObj.get('platform')
+    const platform = platformsById[platformObj.id]
+    return new Transaction({ parseObj, artist, platform })
+  })
+}
+
 export async function getAllTransactions(
   user: User,
-  artists: {[id: string]: IArtist},
-  platforms: {[id: string]: Platform},
+  artists: IArtist[],
+  platforms: Platform[],
   skip: number = 0
 ): Promise<Transaction[]> {
   const query = createQuery(transactionKey)
     .equalTo('user', user)
     .ascending('date').limit(transactionLimit)
     .skip(skip)
-  return query.find().then((parseObjs) => {
-    const transactions = parseObjs.map((parseObj, i, orig) => {
-      if (i === 0) console.log(orig.length)
-      const artistObj = parseObj.get('artist')
-      let artist: IArtist | undefined
-      if (artistObj) artist = artists[artistObj.id]
-      const platformObj = parseObj.get('platform')
-      const platform = platforms[platformObj.id]
-      return new Transaction({ parseObj, artist, platform })
-    })
-    if (transactions.length < skip + transactionLimit) {
-      return transactions
-    }
-    return getAllTransactions(user, artists, platforms, transactions.length).then((rest) => {
-      transactions.push(...rest)
-      return transactions
-    })
-  })
+  const parseObjs = await query.find()
+  const transactions = mapTransactionParseObjs(parseObjs, artists, platforms)
+  if (transactions.length < skip + transactionLimit) {
+    return transactions
+  }
+  const rest = await getAllTransactions(user, artists, platforms, transactions.length)
+  transactions.push(...rest)
+  return transactions
 }
 
 export async function getTransactionsCount(user: User) {
   const query = createQuery(transactionKey).equalTo('user', user)
   return query.count()
+}
+
+export async function getReleaseTransactions(release: IRelease) {
+  const [artists, platforms] = await Promise.all([
+    getArtists(),
+    getPlatforms()
+  ])
+  const ids = release.releaseIds
+  const queries = Object.entries(ids).reduce((acc: ObjectQuery[], [idType, idsForType]) => {
+    idsForType.forEach((id: string) => {
+      const query = createQuery(transactionKey)
+      query.equalTo(idType, id)
+      acc.push(query)
+    })
+    return acc
+  }, [])
+  const result = await orQuery(...queries).find()
+  return mapTransactionParseObjs(result, artists, platforms)
 }
