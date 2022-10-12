@@ -3,6 +3,7 @@ import { BaseObject, ObjectQuery, User } from './types'
 
 export interface IWrappedObj {
   parseObj: BaseObject
+  save(): Promise<void>
 }
 
 export class WrappedObj {
@@ -27,6 +28,10 @@ export class WrappedObj {
     const result = this.parseObj.set(propKey, value)
     if (result) this.parseObj = result
     return result
+  }
+
+  getRelation(relationKey: string) {
+    return this.parseObj.relation(relationKey)
   }
 }
 

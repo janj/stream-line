@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { Box } from '@mui/material'
 import { getTransactionsCount, Transaction } from './transactions'
-import { getTransactionManager, TransactionsManager } from './TransactionsManager'
+import { getTransactionManager } from './TransactionsManager'
 import { TransactionsTable } from '../transactionViews/Table'
 import TrackDetails from '../transactionViews/TrackDetails'
 import Locations from '../transactionViews/Locations'
@@ -9,9 +9,7 @@ import Retailers from '../transactionViews/Retailers'
 import DateRange, { IDateRange } from '../utility/DateRange'
 import { UserContext } from '../contexts'
 
-
 export function TransactionsView() {
-  const [manager, setManager] = useState<TransactionsManager>()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [minDate, setMinDate] = useState<Date>()
@@ -24,7 +22,6 @@ export function TransactionsView() {
   useEffect(() => {
     if (!currentUser) return
     getTransactionManager(currentUser).then((manager) => {
-      setManager(manager)
       manager.getTransactions().then((sorted) => {
         const startDate = sorted.find(({ date }) => !!date)?.date
         const endDate = sorted.pop()?.date

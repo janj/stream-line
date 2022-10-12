@@ -1,5 +1,6 @@
 import { createNewObject, createQuery, IWrappedObj, WrappedObj } from '../../parse/parseObj'
 import { ILabel } from './label'
+import { getArtistFromRelation, IArtist } from '../artists/artist'
 
 const releaseKey = 'Release'
 
@@ -11,7 +12,8 @@ export enum ReleaseIdType {
 enum Properties {
   Label = 'label',
   Name = 'name',
-  ReleaseIds = 'releaseIds'
+  ReleaseIds = 'releaseIds',
+  Artists = 'artists'
 }
 
 export interface IReleaseIds {
@@ -26,9 +28,14 @@ export interface IRelease extends IWrappedObj{
   addReleaseId(idType: ReleaseIdType, value: string): Promise<IReleaseIds>
   removeReleaseId(idType: ReleaseIdType, value: string): Promise<IReleaseIds>
   updateName(newName: string): Promise<void>
+  artists(): Promise<IArtist[]>
+  addArtist(artist: IArtist): Promise<void>
 }
 
 class Release extends WrappedObj implements IRelease{
+  artistsPromise: Promise<IArtist[]> | undefined
+  addedArtists: IArtist[] = []
+
   get name(): string {
     return this.getProperty(Properties.Name)
   }
@@ -49,6 +56,14 @@ class Release extends WrappedObj implements IRelease{
     return releaseIds
   }
 
+  async artists() {
+    if (!this.artistsPromise) {
+      const relation = this.getProperty(Properties.Artists)
+      this.artistsPromise = getArtistFromRelation(relation)
+    }
+    return this.artistsPromise.then((artists) => [...artists, ...this.addedArtists])
+  }
+
   async addReleaseId(idType: ReleaseIdType, value: string) {
     const ids = this.releaseIds
     if (ids[idType].includes(value)) return ids
@@ -64,6 +79,13 @@ class Release extends WrappedObj implements IRelease{
     this.setProperty(Properties.ReleaseIds, ids)
     await this.save()
     return this.releaseIds
+  }
+
+  async addArtist(artist: IArtist) {
+    const relation = this.getRelation(Properties.Artists)
+    relation.add(artist.parseObj)
+    await this.save()
+    this.addedArtists.push(artist)
   }
 }
 

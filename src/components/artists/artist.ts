@@ -1,4 +1,5 @@
 import { createNewObject, createQuery, IWrappedObj, WrappedObj } from '../../parse/parseObj'
+import { ObjectRelation } from '../../parse/types'
 
 const className = 'Artist'
 
@@ -11,6 +12,11 @@ class Artist extends WrappedObj {
   get name() {
     return this.parseObj.get('name')
   }
+}
+
+export async function getArtistFromRelation(artistRelation: ObjectRelation): Promise<IArtist[]> {
+  const result = await artistRelation.query().find()
+  return result.map((parseObj) => new Artist(parseObj))
 }
 
 export async function getArtists() {
